@@ -52,4 +52,5 @@
     <string name="order_number">Order number:</string>
     <string name="order_comment">Order comment:</string>
     <string name="status_placed">Status: Placed</string>
+    <string name="category_name">Category Name</string>
 </resources>
