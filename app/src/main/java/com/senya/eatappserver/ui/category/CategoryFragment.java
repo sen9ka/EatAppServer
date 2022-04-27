@@ -163,7 +163,6 @@ public class CategoryFragment extends Fragment {
             {
                 updateCategory(updateData);
             }
-
         });
 
         builder.setView(itemView);

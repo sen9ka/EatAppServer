@@ -52,4 +52,6 @@
     <string name="order_comment">Order comment:</string>
     <string name="status_placed">Status: Placed</string>
     <string name="category_name">Category Name</string>
+    <string name="food_price">Food Price</string>
+    <string name="food_description">Food Description</string>
 </resources>
