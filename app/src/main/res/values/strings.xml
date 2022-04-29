@@ -54,4 +54,11 @@
     <string name="category_name">Category Name</string>
     <string name="food_price">Food Price</string>
     <string name="food_description">Food Description</string>
+    <string name="addon_size_name">Addon/Size Name</string>
+    <string name="addon_size_price">Addon/Size Price</string>
+    <string name="create">Create</string>
+    <string name="edit">Edit</string>
+    <string name="size_name">Size Name</string>
+    <string name="_6">$6</string>
+    <string name="save">Save</string>
 </resources>

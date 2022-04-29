@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EatAppServer">
         <activity
+            android:name=".SizeAddonEditActivity"
+            android:exported="false" />
+        <activity
             android:name=".HomeActivity"
             android:exported="false"
             android:label="@string/title_activity_home"
