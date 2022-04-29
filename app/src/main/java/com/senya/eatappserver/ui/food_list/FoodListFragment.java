@@ -39,7 +39,11 @@ import com.senya.eatappserver.adapter.MyFoodListAdapter;
 import com.senya.eatappserver.common.Common;
 import com.senya.eatappserver.common.MySwipeHelper;
 import com.senya.eatappserver.databinding.FragmentFoodListBinding;
+import com.senya.eatappserver.model.EventBus.ChangeMenuClick;
+import com.senya.eatappserver.model.EventBus.ToastEvent;
 import com.senya.eatappserver.model.FoodModel;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -225,18 +229,18 @@ public class FoodListFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                 })
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful())
-                        {
-                            foodListViewModel.getMutableLiveDataFoodList();
-                            if(isDelete)
-                                Toast.makeText(getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
-                            else
-                                Toast.makeText(getContext(), "Successfully Updated", Toast.LENGTH_SHORT).show();
-                        }
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful())
+                    {
+                        foodListViewModel.getMutableLiveDataFoodList();
+                        EventBus.getDefault().postSticky(new ToastEvent(!isDelete, true));
                     }
                 });
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().postSticky(new ChangeMenuClick(true));
+        super.onDestroy();
     }
 }

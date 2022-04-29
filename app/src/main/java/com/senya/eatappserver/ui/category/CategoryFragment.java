@@ -40,6 +40,9 @@ import com.senya.eatappserver.common.Common;
 import com.senya.eatappserver.common.MySwipeHelper;
 import com.senya.eatappserver.common.SpacesItemDecoration;
 import com.senya.eatappserver.model.CategoryModel;
+import com.senya.eatappserver.model.EventBus.ToastEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -178,7 +181,7 @@ public class CategoryFragment extends Fragment {
                 .addOnFailureListener(e -> Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show())
                 .addOnCompleteListener(task -> {
                     categoryViewModel.loadCategories();
-                    Toast.makeText(getContext(), "Successfully Updated", Toast.LENGTH_SHORT).show();
+                    EventBus.getDefault().postSticky(new ToastEvent(true, false));
                 });
     }
 
