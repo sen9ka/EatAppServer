@@ -64,4 +64,9 @@
     <string name="action_search">Search</string>
     <string name="menu_order">Orders</string>
     <string name="menu_sign_out">Sign Out</string>
+    <string name="_26_11_2019_13_05_06">26/11/2019 13:05:06</string>
+    <string name="order_date_woah_letters">Order date: abcdefasdasdadadaads</string>
+    <string name="name_senya">Name: Senya</string>
+    <string name="order_status_placed">Order Status: Placed</string>
+    <string name="num_of_items_10">Num of items: 10</string>
 </resources>
