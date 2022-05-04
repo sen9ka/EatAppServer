@@ -62,4 +62,6 @@
     <string name="_6">$6</string>
     <string name="save">Save</string>
     <string name="action_search">Search</string>
+    <string name="menu_order">Orders</string>
+    <string name="menu_sign_out">Sign Out</string>
 </resources>

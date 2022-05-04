@@ -1,14 +1,20 @@
 package com.senya.eatappserver;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.media.metrics.Event;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -16,6 +22,8 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.senya.eatappserver.common.Common;
 import com.senya.eatappserver.databinding.ActivityHomeBinding;
 import com.senya.eatappserver.model.EventBus.CategoryClick;
 import com.senya.eatappserver.model.EventBus.ChangeMenuClick;
@@ -25,7 +33,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityHomeBinding binding;
@@ -48,12 +56,18 @@ public class HomeActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_category, R.id.nav_food_list, R.id.nav_slideshow)
+                R.id.nav_category, R.id.nav_food_list, R.id.nav_order)
                 .setOpenableLayout(drawer)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_home);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.bringToFront();
+
+        View headerView = navigationView.getHeaderView(0);
+        TextView txt_user = (TextView) headerView.findViewById(R.id.txt_user);
+        Common.setSpanString("Hello, ", Common.currentServerUser.getName(),txt_user);
     }
 
     @Override
@@ -125,5 +139,58 @@ public class HomeActivity extends AppCompatActivity {
             navController.navigate(R.id.nav_food_list);
         }
         menuClick = -1;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        menuItem.setChecked(true);
+        drawer.closeDrawers();
+        switch (menuItem.getItemId())
+        {
+            case R.id.nav_category:
+                if(menuItem.getItemId() != menuClick)
+                    navController.navigate(R.id.nav_category);
+                break;
+            case R.id.nav_order:
+                if(menuItem.getItemId() != menuClick)
+                    navController.navigate(R.id.nav_order);
+                break;
+            case R.id.nav_sign_out:
+                signOut();
+                break;
+            default:
+                menuClick = -1;
+                break;
+        }
+
+        menuClick = menuItem.getItemId();
+        return true;
+    }
+
+    private void signOut() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sign Out")
+                .setMessage("Do you really want to sign out?")
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Common.selectedFood = null;
+                Common.categorySelected = null;
+                Common.currentServerUser = null;
+                FirebaseAuth.getInstance().signOut();
+
+                Intent intent = new Intent(HomeActivity.this,MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
