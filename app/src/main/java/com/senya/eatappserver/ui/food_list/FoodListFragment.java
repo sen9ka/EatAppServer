@@ -1,6 +1,8 @@
 package com.senya.eatappserver.ui.food_list;
 
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -8,12 +10,16 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.EditText;
 import android.widget.ImageView;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -48,8 +55,10 @@ import com.senya.eatappserver.model.FoodModel;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -78,6 +87,59 @@ public class FoodListFragment extends Fragment {
     MyFoodListAdapter adapter;
     private Uri imageUri = null;
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.food_list_menu,menu);
+
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+
+        //Event
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                startSearchFood(s);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+
+        //Очистить текст когда нажимаем на кнопку поиска
+        ImageView closeButton = (ImageView) searchView.findViewById(com.karumi.dexter.R.id.search_close_btn);
+        closeButton.setOnClickListener(view -> {
+            EditText ed = (EditText) searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+            //Очистить текст
+            ed.setText("");
+            //Очистить очередь
+            searchView.setQuery("",false);
+
+            searchView.onActionViewCollapsed();
+            menuItem.collapseActionView();
+
+            foodListViewModel.getMutableLiveDataFoodList().setValue(Common.categorySelected.getFoods());
+        });
+    }
+
+    private void startSearchFood(String s) {
+        List<FoodModel>resultFood = new ArrayList<>();
+        for(int i = 0; i < Common.categorySelected.getFoods().size();i++) {
+            FoodModel foodModel = Common.categorySelected.getFoods().get(i);
+            if (foodModel.getName().toLowerCase().contains(s.toLowerCase()))
+            {
+                foodModel.setPositionInList(i); //сохранить индекс
+                resultFood.add(foodModel);
+            }
+        }
+            foodListViewModel.getMutableLiveDataFoodList().setValue(resultFood); //показать результат поиска
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         foodListViewModel =
@@ -99,6 +161,8 @@ public class FoodListFragment extends Fragment {
     }
 
     private void initViews() {
+
+        setHasOptionsMenu(true); //Включить меню в fragment
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -130,8 +194,11 @@ public class FoodListFragment extends Fragment {
                                     .setMessage("Are you sure you want to delete this item?")
                                     .setNegativeButton("CANCEL", ((dialogInterface, i) -> dialogInterface.dismiss()))
                                     .setPositiveButton("DELETE", ((dialogInterface, i) -> {
-
-                                        Common.categorySelected.getFoods().remove(pos);
+                                        FoodModel foodModel = adapter.getItemAtPosition(pos); // Добавить айтем в адаптер
+                                        if(foodModel.getPositionInList() == -1) // Если == -1 дефолт, ничего не делать
+                                            Common.categorySelected.getFoods().remove(pos);
+                                        else
+                                            Common.categorySelected.getFoods().remove(foodModel.getPositionInList()); //убрать через сохраненный индекс
                                         updateFood(Common.categorySelected.getFoods(), true);
                                     }));
                             AlertDialog deleteDialog = builder.create();
@@ -142,32 +209,48 @@ public class FoodListFragment extends Fragment {
                 buf.add(new MyButton(getContext(),"Update",30,0, Color.parseColor("#560027"),
                         pos -> {
 
-                            showUpdateDialog(pos);
+                        FoodModel foodModel = adapter.getItemAtPosition(pos);
+                        if(foodModel.getPositionInList() == -1)
+                            showUpdateDialog(pos,foodModel);
+                        else
+                            showUpdateDialog(foodModel.getPositionInList(),foodModel);
 
                         }));
 
                 buf.add(new MyButton(getContext(),"Size",30,0, Color.parseColor("#12005e"),
                         pos -> {
-
-                            Common.selectedFood = foodModelList.get(pos);
+                            FoodModel foodModel = adapter.getItemAtPosition(pos);
+                            if(foodModel.getPositionInList() == -1)
+                                Common.selectedFood = foodModelList.get(pos);
+                            else
+                                Common.selectedFood = foodModel;
                             startActivity(new Intent(getContext(), SizeAddonEditActivity.class));
-                            EventBus.getDefault().postSticky(new AddonSizeEditEvent(false,pos));
-
+                            //изменить pos
+                            if(foodModel.getPositionInList() == -1)
+                                EventBus.getDefault().postSticky(new AddonSizeEditEvent(false,pos));
+                            else
+                                EventBus.getDefault().postSticky(new AddonSizeEditEvent(false,foodModel.getPositionInList()));
                         }));
 
                 buf.add(new MyButton(getContext(),"Addon",30,0, Color.parseColor("#336699"),
                         pos -> {
 
-                            Common.selectedFood = foodModelList.get(pos);
+                            FoodModel foodModel = adapter.getItemAtPosition(pos);
+                            if(foodModel.getPositionInList() == -1)
+                                Common.selectedFood = foodModelList.get(pos);
+                            else
+                                Common.selectedFood = foodModel;
                             startActivity(new Intent(getContext(), SizeAddonEditActivity.class));
-                            EventBus.getDefault().postSticky(new AddonSizeEditEvent(true,pos));
-
+                            if(foodModel.getPositionInList() == -1)
+                                EventBus.getDefault().postSticky(new AddonSizeEditEvent(true,pos));
+                            else
+                                EventBus.getDefault().postSticky(new AddonSizeEditEvent(true,foodModel.getPositionInList()));
                         }));
             }
         };
     }
 
-    private void showUpdateDialog(int pos) {
+    private void showUpdateDialog(int pos, FoodModel foodModel) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Update");
         builder.setMessage("Please fill in information");
@@ -178,14 +261,15 @@ public class FoodListFragment extends Fragment {
         EditText edt_food_description = (EditText) itemView.findViewById(R.id.edt_food_description);
         img_food = (ImageView) itemView.findViewById(R.id.img_food_image);
 
+        //Set data
         edt_food_name.setText(new StringBuilder("")
-        .append(Common.categorySelected.getFoods().get(pos).getName()));
+        .append(foodModel.getName()));
         edt_food_price.setText(new StringBuilder("")
-                .append(Common.categorySelected.getFoods().get(pos).getPrice()));
+                .append(foodModel.getPrice()));
         edt_food_description.setText(new StringBuilder("")
-                .append(Common.categorySelected.getFoods().get(pos).getDescription()));
+                .append(foodModel.getDescription()));
 
-        Glide.with(getContext()).load(Common.categorySelected.getFoods().get(pos).getImage()).into(img_food);
+        Glide.with(getContext()).load(foodModel.getImage()).into(img_food);
 
         img_food.setOnClickListener(v -> {
             Intent intent = new Intent();
@@ -197,7 +281,7 @@ public class FoodListFragment extends Fragment {
         builder.setNegativeButton("CANCEL", ((dialogInterface, i) -> dialogInterface.dismiss()))
                 .setPositiveButton("UPDATE",((dialogInterface, i) -> {
 
-                    FoodModel updateFood = Common.categorySelected.getFoods().get(pos);
+                    FoodModel updateFood = foodModel;
                     updateFood.setName(edt_food_name.getText().toString());
                     updateFood.setDescription(edt_food_description.getText().toString());
                     updateFood.setPrice(TextUtils.isEmpty(edt_food_price.getText()) ? 0 :

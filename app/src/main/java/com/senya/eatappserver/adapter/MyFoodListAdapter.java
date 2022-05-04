@@ -67,6 +67,11 @@ public class MyFoodListAdapter extends RecyclerView.Adapter<MyFoodListAdapter.My
         return foodModelList.size();
     }
 
+    public FoodModel getItemAtPosition(int pos)
+    {
+        return foodModelList.get(pos);
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Unbinder unbinder;
         @BindView(R.id.txt_food_name)
