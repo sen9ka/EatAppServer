@@ -50,7 +50,6 @@
     <string name="today_at_13_05_56_pm">Today at: 13:05:56 pm</string>
     <string name="order_number">Order number:</string>
     <string name="order_comment">Order comment:</string>
-    <string name="status_placed">Status: Placed</string>
     <string name="category_name">Category Name</string>
     <string name="food_price">Food Price</string>
     <string name="food_description">Food Description</string>
@@ -75,4 +74,11 @@
     <string name="shipped">Shipped</string>
     <string name="cancelled">Cancelled</string>
     <string name="orders_0">Orders (0)</string>
+    <string name="update_order">Update Order</string>
+    <string name="update_order_status">Update Order Status</string>
+    <string name="status_placed">Status: Placed</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="restore_placed">Restore Placed</string>
+    <string name="delete">Delete</string>
 </resources>

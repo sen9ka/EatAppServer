@@ -68,6 +68,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         View headerView = navigationView.getHeaderView(0);
         TextView txt_user = (TextView) headerView.findViewById(R.id.txt_user);
         Common.setSpanString("Hello, ", Common.currentServerUser.getName(),txt_user);
+
+        menuClick = R.id.nav_category; //Дефолт
     }
 
     @Override
@@ -147,11 +149,17 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         {
             case R.id.nav_category:
                 if(menuItem.getItemId() != menuClick)
+                {
+                    navController.popBackStack(); //удалить все до этого открытые окна
                     navController.navigate(R.id.nav_category);
+                }
                 break;
             case R.id.nav_order:
                 if(menuItem.getItemId() != menuClick)
+                {
+                    navController.popBackStack();
                     navController.navigate(R.id.nav_order);
+                }
                 break;
             case R.id.nav_sign_out:
                 signOut();
