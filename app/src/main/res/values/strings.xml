@@ -69,4 +69,10 @@
     <string name="name_senya">Name: Senya</string>
     <string name="order_status_placed">Order Status: Placed</string>
     <string name="num_of_items_10">Num of items: 10</string>
+    <string name="action_filter">Filter</string>
+    <string name="placed">Placed</string>
+    <string name="shipping">Shipping</string>
+    <string name="shipped">Shipped</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="orders_0">Orders (0)</string>
 </resources>

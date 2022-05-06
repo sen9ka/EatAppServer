@@ -36,7 +36,7 @@ public class OrderViewModel extends ViewModel implements IOrderCallbackListener 
         return orderModelMutableLiveData;
     }
 
-    private void loadOrderByStatus(int status) {
+    public void loadOrderByStatus(int status) {
         List<OrderModel> tempList = new ArrayList<>();
         Query orderRef = FirebaseDatabase.getInstance().getReference(Common.ORDER_REF)
                 .orderByChild("orderStatus")
