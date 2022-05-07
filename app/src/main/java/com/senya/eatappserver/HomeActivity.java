@@ -10,6 +10,9 @@ import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -23,6 +26,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.senya.eatappserver.common.Common;
 import com.senya.eatappserver.databinding.ActivityHomeBinding;
 import com.senya.eatappserver.model.EventBus.CategoryClick;
@@ -51,6 +55,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         setSupportActionBar(binding.appBarHome.toolbar);
 
+        subscribeToTopic(Common.createTopicOrder());
+
         drawer = binding.drawerLayout;
         navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
@@ -70,6 +76,18 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         Common.setSpanString("Hello, ", Common.currentServerUser.getName(),txt_user);
 
         menuClick = R.id.nav_category; //Дефолт
+    }
+
+    private void subscribeToTopic(String topicOrder) {
+        FirebaseMessaging.getInstance()
+                .subscribeToTopic(topicOrder)
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                })
+                .addOnCompleteListener(task -> {
+                    if(!task.isSuccessful())
+                        Toast.makeText(this, "Failed "+task.isSuccessful(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
