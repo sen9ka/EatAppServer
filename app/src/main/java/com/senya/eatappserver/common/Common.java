@@ -36,7 +36,7 @@ public class Common {
     public static CategoryModel categorySelected;
     public static final String NOTI_TITLE = "title";
     public static final String NOTI_CONTENT = "content";
-    private static final String TOKEN_REF = "Tokens";
+    public static final String TOKEN_REF = "Tokens";
 
     public static final int DEFAULT_COLUMN_COUNT = 0;
     public static final int FULL_WIDTH_COLUMN = 1;
