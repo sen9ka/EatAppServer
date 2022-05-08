@@ -32,6 +32,7 @@ public class Common {
     public static final String SERVER_REF = "Server";
     public static final String CATEGORY_REF = "Category";
     public static final String ORDER_REF = "Order";
+    public static final String SHIPPER = "Shippers";
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static final String NOTI_TITLE = "title";

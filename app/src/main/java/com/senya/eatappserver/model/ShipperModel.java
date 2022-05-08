@@ -1,17 +1,18 @@
 package com.senya.eatappserver.model;
 
-public class ServerUserModel {
-    private String uid, name, phone;
+public class ShipperModel {
+    private String key, uid, name, phone;
     private boolean active;
 
-    public ServerUserModel() {
+    public ShipperModel() {
     }
 
-    public ServerUserModel(String uid, String name, String phone, boolean active) {
-        this.uid = uid;
-        this.name = name;
-        this.phone = phone;
-        this.active = active;
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getUid() {
