@@ -111,11 +111,11 @@ public class Common {
         notificationManager.notify(id,notification);
     }
 
-    public static void updateToken(Context context, String newToken) {
+    public static void updateToken(Context context, String newToken, boolean isServer, boolean isShipper) {
         FirebaseDatabase.getInstance()
                 .getReference(Common.TOKEN_REF)
                 .child(Common.currentServerUser.getUid())
-                .setValue(new TokenModel(Common.currentServerUser.getPhone(), newToken))
+                .setValue(new TokenModel(Common.currentServerUser.getPhone(), newToken,isServer,isShipper))
                 .addOnFailureListener(e -> {
                     Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });

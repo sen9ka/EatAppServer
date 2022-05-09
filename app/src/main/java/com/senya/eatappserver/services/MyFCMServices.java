@@ -25,6 +25,6 @@ public class MyFCMServices extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
-        Common.updateToken(this,s);
+        Common.updateToken(this,s,true,false);
     }
 }
