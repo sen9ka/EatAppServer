@@ -1,6 +1,10 @@
 package com.senya.eatappserver.ui.shipper;
 
+import android.widget.Button;
+import android.widget.RadioButton;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -11,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.senya.eatappserver.callback.IShipperLoadCallbackListener;
 import com.senya.eatappserver.common.Common;
+import com.senya.eatappserver.model.OrderModel;
 import com.senya.eatappserver.model.ShipperModel;
 
 import java.util.ArrayList;
@@ -64,6 +69,11 @@ public class ShipperViewModel extends ViewModel implements IShipperLoadCallbackL
     public void onShipperLoadSuccess(List<ShipperModel> shipperModelList) {
         if(shipperMutableList != null)
             shipperMutableList.setValue(shipperModelList);
+    }
+
+    @Override
+    public void onShipperLoadSuccess(int pos, OrderModel orderModel, List<ShipperModel> shipperModels, AlertDialog dialog, Button btn_ok, Button btn_cancel, RadioButton rdi_shipping, RadioButton rdi_shipped, RadioButton rdi_cancelled, RadioButton rdi_delete, RadioButton rdi_restore_placed) {
+        //nothing
     }
 
     @Override

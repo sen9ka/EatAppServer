@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,7 +35,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -45,6 +48,8 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import com.senya.eatappserver.R;
 import com.senya.eatappserver.SizeAddonEditActivity;
 import com.senya.eatappserver.adapter.MyOrderAdapter;
+import com.senya.eatappserver.adapter.MyShipperSelectionAdapter;
+import com.senya.eatappserver.callback.IShipperLoadCallbackListener;
 import com.senya.eatappserver.common.BottomSheetOrderFragment;
 import com.senya.eatappserver.common.Common;
 import com.senya.eatappserver.common.MySwipeHelper;
@@ -55,6 +60,7 @@ import com.senya.eatappserver.model.FCMResponse;
 import com.senya.eatappserver.model.FCMSendData;
 import com.senya.eatappserver.model.FoodModel;
 import com.senya.eatappserver.model.OrderModel;
+import com.senya.eatappserver.model.ShipperModel;
 import com.senya.eatappserver.model.TokenModel;
 import com.senya.eatappserver.remote.IFCMService;
 import com.senya.eatappserver.remote.RetrofitFCMClient;
@@ -63,6 +69,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,11 +83,13 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class OrderFragment extends Fragment {
+public class OrderFragment extends Fragment implements IShipperLoadCallbackListener {
     @BindView(R.id.recycler_order)
     RecyclerView recycler_order;
     @BindView(R.id.txt_order_filter)
     TextView txt_order_filter;
+
+    RecyclerView recycler_shipper;
 
     Unbinder unbinder;
     LayoutAnimationController layoutAnimationController;
@@ -89,7 +98,10 @@ public class OrderFragment extends Fragment {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private IFCMService ifcmService;
 
+    private IShipperLoadCallbackListener shipperLoadCallbackListener;
+
     private OrderViewModel orderViewModel;
+    private MyShipperSelectionAdapter myShipperSelectedAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -117,6 +129,8 @@ public class OrderFragment extends Fragment {
     private void initViews() {
 
         ifcmService = RetrofitFCMClient.getInstance().create(IFCMService.class);
+
+        shipperLoadCallbackListener = this;
 
         setHasOptionsMenu(true);
 
@@ -217,6 +231,9 @@ public class OrderFragment extends Fragment {
         {
             layout_dialog = LayoutInflater.from(getContext())
                     .inflate(R.layout.layout_dialog_shipping,null);
+
+            recycler_shipper = layout_dialog.findViewById(R.id.recycler_shippers);
+
             builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_NoActionBar_Fullscreen)
             .setView(layout_dialog);
         }
@@ -251,6 +268,44 @@ public class OrderFragment extends Fragment {
 
         //Диалог
         AlertDialog dialog = builder.create();
+
+        if(orderModel.getOrderStatus() == 0) //Shipping
+            loadShipperList(pos,orderModel,dialog,btn_ok,btn_cancel,
+                    rdi_shipping,rdi_shipped,rdi_cancelled,rdi_delete,rdi_restore_placed);
+        else
+            showDialog(pos,orderModel,dialog,btn_ok,btn_cancel,
+                    rdi_shipping,rdi_shipped,rdi_cancelled,rdi_delete,rdi_restore_placed);
+
+        
+    }
+
+    private void loadShipperList(int pos, OrderModel orderModel, AlertDialog dialog, Button btn_ok, Button btn_cancel, RadioButton rdi_shipping, RadioButton rdi_shipped, RadioButton rdi_cancelled, RadioButton rdi_delete, RadioButton rdi_restore_placed) {
+        List<ShipperModel> tempList = new ArrayList<>();
+        DatabaseReference shipperRef = FirebaseDatabase.getInstance().getReference(Common.SHIPPER);
+        Query shipperActive = shipperRef.orderByChild("active").equalTo(true); //загрузить только активных курьеров
+        shipperActive.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot shipperSnapshot : snapshot.getChildren())
+                {
+                    ShipperModel shipperModel = shipperSnapshot.getValue(ShipperModel.class);
+                    shipperModel.setKey(shipperSnapshot.getKey());
+                    tempList.add(shipperModel);
+                }
+                shipperLoadCallbackListener.onShipperLoadSuccess(pos,orderModel,tempList,
+                        dialog,
+                        btn_ok,btn_cancel,
+                        rdi_shipping,rdi_shipped,rdi_cancelled,rdi_delete,rdi_restore_placed);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                shipperLoadCallbackListener.onShipperLoadFailed(error.getMessage());
+            }
+        });
+    }
+
+    private void showDialog(int pos, OrderModel orderModel, AlertDialog dialog, Button btn_ok, Button btn_cancel, RadioButton rdi_shipping, RadioButton rdi_shipped, RadioButton rdi_cancelled, RadioButton rdi_delete, RadioButton rdi_restore_placed) {
         dialog.show();
         //Кастомный
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -258,17 +313,42 @@ public class OrderFragment extends Fragment {
 
         btn_cancel.setOnClickListener(view -> dialog.dismiss());
         btn_ok.setOnClickListener(view -> {
-            dialog.dismiss();
             if(rdi_cancelled != null && rdi_cancelled.isChecked())
+            {
                 updateOrder(pos,orderModel,-1);
+                dialog.dismiss();
+            }
             else if(rdi_shipping != null && rdi_shipping.isChecked())
-                updateOrder(pos,orderModel,1);
+            {
+                //updateOrder(pos,orderModel,1);
+                ShipperModel shipperModel = null;
+                if(myShipperSelectedAdapter != null)
+                {
+                    shipperModel = myShipperSelectedAdapter.getSelectedShipper();
+                    if(shipperModel != null)
+                    {
+                        Toast.makeText(getContext(), ""+shipperModel.getName(), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                    else
+                        Toast.makeText(getContext(), "Please select shipper", Toast.LENGTH_SHORT).show();
+                }
+            }
             else if(rdi_shipped != null && rdi_shipped.isChecked())
+            {
                 updateOrder(pos,orderModel,2);
+                dialog.dismiss();
+            }
             else if(rdi_restore_placed != null && rdi_restore_placed.isChecked())
+            {
                 updateOrder(pos,orderModel,0);
+                dialog.dismiss();
+            }
             else if(rdi_delete != null && rdi_delete.isChecked())
+            {
                 deleteOrder(pos,orderModel);
+                dialog.dismiss();
+            }
         });
     }
 
@@ -429,5 +509,30 @@ public class OrderFragment extends Fragment {
     public void onLoadOrderEvent(LoadOrderEvent event)
     {
         orderViewModel.loadOrderByStatus(event.getStatus());
+    }
+
+    @Override
+    public void onShipperLoadSuccess(List<ShipperModel> shipperModelList) {
+        //пусто
+    }
+
+    @Override
+    public void onShipperLoadSuccess(int pos, OrderModel orderModel, List<ShipperModel> shipperModels, AlertDialog dialog, Button btn_ok, Button btn_cancel, RadioButton rdi_shipping, RadioButton rdi_shipped, RadioButton rdi_cancelled, RadioButton rdi_delete, RadioButton rdi_restore_placed) {
+        if(recycler_shipper != null)
+        {
+            recycler_shipper.setHasFixedSize(true);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+            recycler_shipper.setLayoutManager(layoutManager);
+            recycler_shipper.addItemDecoration(new DividerItemDecoration(getContext(),layoutManager.getOrientation()));
+
+            myShipperSelectedAdapter = new MyShipperSelectionAdapter(getContext(),shipperModels);
+            recycler_shipper.setAdapter(myShipperSelectedAdapter);
+        }
+        showDialog(pos, orderModel, dialog, btn_ok, btn_cancel, rdi_shipping, rdi_shipped, rdi_cancelled, rdi_delete, rdi_restore_placed);
+    }
+
+    @Override
+    public void onShipperLoadFailed(String message) {
+        Toast.makeText(getContext(), ""+message, Toast.LENGTH_SHORT).show();
     }
 }
