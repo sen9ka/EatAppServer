@@ -257,7 +257,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
 
         TextView txt_status = (TextView) layout_dialog.findViewById(R.id.txt_status);
 
-        txt_status.setText(new StringBuilder("Order Status(")
+        txt_status.setText(new StringBuilder("Order Status( ")
         .append(Common.convertStatusToString(orderModel.getOrderStatus())));
 
         //Диалог
