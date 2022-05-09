@@ -31,8 +31,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,21 +44,18 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.senya.eatappserver.R;
-import com.senya.eatappserver.SizeAddonEditActivity;
 import com.senya.eatappserver.adapter.MyOrderAdapter;
 import com.senya.eatappserver.adapter.MyShipperSelectionAdapter;
 import com.senya.eatappserver.callback.IShipperLoadCallbackListener;
 import com.senya.eatappserver.common.BottomSheetOrderFragment;
 import com.senya.eatappserver.common.Common;
 import com.senya.eatappserver.common.MySwipeHelper;
-import com.senya.eatappserver.model.EventBus.AddonSizeEditEvent;
 import com.senya.eatappserver.model.EventBus.ChangeMenuClick;
 import com.senya.eatappserver.model.EventBus.LoadOrderEvent;
-import com.senya.eatappserver.model.FCMResponse;
 import com.senya.eatappserver.model.FCMSendData;
-import com.senya.eatappserver.model.FoodModel;
 import com.senya.eatappserver.model.OrderModel;
 import com.senya.eatappserver.model.ShipperModel;
+import com.senya.eatappserver.model.ShippingOrderModel;
 import com.senya.eatappserver.model.TokenModel;
 import com.senya.eatappserver.remote.IFCMService;
 import com.senya.eatappserver.remote.RetrofitFCMClient;
@@ -80,7 +75,6 @@ import butterknife.Unbinder;
 import dmax.dialog.SpotsDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class OrderFragment extends Fragment implements IShipperLoadCallbackListener {
@@ -320,15 +314,13 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
             }
             else if(rdi_shipping != null && rdi_shipping.isChecked())
             {
-                //updateOrder(pos,orderModel,1);
                 ShipperModel shipperModel = null;
                 if(myShipperSelectedAdapter != null)
                 {
                     shipperModel = myShipperSelectedAdapter.getSelectedShipper();
                     if(shipperModel != null)
                     {
-                        Toast.makeText(getContext(), ""+shipperModel.getName(), Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
+                        createShippingOrder(pos, shipperModel,orderModel,dialog);
                     }
                     else
                         Toast.makeText(getContext(), "Please select shipper", Toast.LENGTH_SHORT).show();
@@ -350,6 +342,32 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                 dialog.dismiss();
             }
         });
+    }
+
+    private void createShippingOrder(int pos, ShipperModel shipperModel, OrderModel orderModel, AlertDialog dialog) {
+        ShippingOrderModel shippingOrderModel = new ShippingOrderModel();
+        shippingOrderModel.setShipperPhone(shipperModel.getPhone());
+        shippingOrderModel.setShipperName(shipperModel.getName());
+        shippingOrderModel.setOrderModel(orderModel);
+        shippingOrderModel.setStartTrip(false);
+        shippingOrderModel.setCurrentLat(-1.0);
+        shippingOrderModel.setCurrentLng(-1.0);
+
+        FirebaseDatabase.getInstance()
+                .getReference(Common.SHIPPING_ORDER_REF)
+                .push()
+                .setValue(shippingOrderModel)
+                .addOnFailureListener(e -> {
+                    dialog.dismiss();
+                    Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                })
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful())
+                    {
+                        dialog.dismiss();
+                        updateOrder(pos,orderModel,1);
+                    }
+                });
     }
 
     private void deleteOrder(int pos, OrderModel orderModel) {
