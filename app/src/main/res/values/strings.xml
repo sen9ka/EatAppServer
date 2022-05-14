@@ -85,4 +85,9 @@
     <string name="_191519195151">+191519195151</string>
     <string name="menu_shipper">Shippers</string>
     <string name="_79555555555">+79555555555</string>
+    <string name="order_details">Order Details</string>
+    <string name="thai_salad_style">THAI SALAD STYLE</string>
+    <string name="quantity_1">Quantity: 1</string>
+    <string name="addon_default">Addon: Default</string>
+    <string name="size_medium">Size: Medium</string>
 </resources>
