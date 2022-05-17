@@ -44,6 +44,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.senya.eatappserver.R;
+import com.senya.eatappserver.TrackingOrderActivity;
 import com.senya.eatappserver.adapter.MyOrderAdapter;
 import com.senya.eatappserver.adapter.MyShipperSelectionAdapter;
 import com.senya.eatappserver.callback.IShipperLoadCallbackListener;
@@ -143,7 +144,20 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                 buf.add(new MyButton(getContext(),"Directions",30,0, Color.parseColor("#9b0000"),
                         pos -> {
 
+                            OrderModel orderModel = ((MyOrderAdapter)recycler_order.getAdapter())
+                                    .getItemAtPosition(pos);
+                            if(orderModel.getOrderStatus() == 1)
+                            {
+                                Common.currentOrderSelected = orderModel;
+                                startActivity(new Intent(getContext(), TrackingOrderActivity.class));
 
+                            }
+                            else 
+                            {
+                                Toast.makeText(getContext(), new StringBuilder("Your order is")
+                                        .append(Common.convertStatusToString(orderModel.getOrderStatus()))
+                                        .append(". So you can not track it"), Toast.LENGTH_SHORT).show();
+                            }
 
                         }));
 
@@ -355,7 +369,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
 
         FirebaseDatabase.getInstance()
                 .getReference(Common.SHIPPING_ORDER_REF)
-                .push()
+                .child(orderModel.getKey())
                 .setValue(shippingOrderModel)
                 .addOnFailureListener(e -> {
                     dialog.dismiss();

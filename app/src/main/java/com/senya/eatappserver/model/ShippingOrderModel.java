@@ -3,12 +3,21 @@ package com.senya.eatappserver.model;
 import androidx.room.Index;
 
 public class ShippingOrderModel {
+    private String key;
     private String shipperPhone, shipperName;
     private double currentLat, currentLng;
     private OrderModel orderModel;
     private boolean isStartTrip;
 
     public ShippingOrderModel() {
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getShipperPhone() {

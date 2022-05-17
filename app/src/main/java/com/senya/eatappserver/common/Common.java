@@ -21,12 +21,17 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.FirebaseDatabase;
 import com.senya.eatappserver.R;
 import com.senya.eatappserver.model.CategoryModel;
 import com.senya.eatappserver.model.FoodModel;
+import com.senya.eatappserver.model.OrderModel;
 import com.senya.eatappserver.model.ServerUserModel;
 import com.senya.eatappserver.model.TokenModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Common {
     public static final String SERVER_REF = "Server";
@@ -43,6 +48,7 @@ public class Common {
     public static final int DEFAULT_COLUMN_COUNT = 0;
     public static final int FULL_WIDTH_COLUMN = 1;
     public static FoodModel selectedFood;
+    public static OrderModel currentOrderSelected;
 
     public static void setSpanString(String welcome, String name, TextView textView) {
         SpannableStringBuilder builder = new SpannableStringBuilder();
@@ -112,16 +118,52 @@ public class Common {
     }
 
     public static void updateToken(Context context, String newToken, boolean isServer, boolean isShipper) {
-        FirebaseDatabase.getInstance()
-                .getReference(Common.TOKEN_REF)
-                .child(Common.currentServerUser.getUid())
-                .setValue(new TokenModel(Common.currentServerUser.getPhone(), newToken,isServer,isShipper))
-                .addOnFailureListener(e -> {
-                    Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        if(Common.currentServerUser != null)
+        {
+            FirebaseDatabase.getInstance()
+                    .getReference(Common.TOKEN_REF)
+                    .child(Common.currentServerUser.getUid())
+                    .setValue(new TokenModel(Common.currentServerUser.getPhone(), newToken,isServer,isShipper))
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
     }
 
     public static String createTopicOrder() {
         return new StringBuilder("/topics/new_order").toString();
+    }
+
+    public static List<LatLng> decodePoly(String encoded) {
+        List poly = new ArrayList();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+        while(index < len)
+        {
+            int b, shift = 0, result = 0;
+            do {
+                b=encoded.charAt(index++)-63;
+                result |= (b & 0x1f) << shift;
+                shift +=5;
+
+            }while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1):(result>>1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++)-63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            }while (b >= 0x20);
+            int dlng = ((result & 1)!=0 ? ~ (result>>1): (result >>1));
+            lng += dlng;
+
+            LatLng p = new LatLng((((double)lat / 1E5)),
+                    (((double)lng/1E5)));
+            poly.add(p);
+        }
+        return poly;
     }
 }

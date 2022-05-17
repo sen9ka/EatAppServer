@@ -48,6 +48,7 @@ public class OrderViewModel extends ViewModel implements IOrderCallbackListener 
                 {
                     OrderModel orderModel = itemSnapShot.getValue(OrderModel.class);
                     orderModel.setKey(itemSnapShot.getKey());
+                    orderModel.setOrderNumber(itemSnapShot.getKey());
                     tempList.add(orderModel);
                 }
                 listener.onOrderLoadSuccess(tempList);
