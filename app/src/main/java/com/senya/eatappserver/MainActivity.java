@@ -168,8 +168,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void goToHomeActivity(ServerUserModel serverUserModel) {
         dialog.dismiss();
+
         Common.currentServerUser = serverUserModel;
-        startActivity(new Intent(this,HomeActivity.class));
+        Intent intent = new Intent(this,HomeActivity.class);
+        intent.putExtra(Common.IS_OPEN_ACTIVITY_NEW_ORDER,getIntent().getBooleanExtra(Common.IS_OPEN_ACTIVITY_NEW_ORDER,false));
+        startActivity(intent);
         finish();
     }
 

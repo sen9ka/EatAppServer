@@ -80,6 +80,18 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         Common.setSpanString("Hello, ", Common.currentServerUser.getName(),txt_user);
 
         menuClick = R.id.nav_category; //Дефолт
+
+        checkIsOpenFromActivity();
+    }
+
+    private void checkIsOpenFromActivity() {
+        boolean isOpenFromNewOrder = getIntent().getBooleanExtra(Common.IS_OPEN_ACTIVITY_NEW_ORDER,false);
+        if(isOpenFromNewOrder)
+        {
+            navController.popBackStack();
+            navController.navigate(R.id.nav_order);
+            menuClick = R.id.nav_order;
+        }
     }
 
     private void updateToken() {
@@ -89,6 +101,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 .addOnSuccessListener(instanceIdResult -> {
                     Common.updateToken(HomeActivity.this,instanceIdResult.getToken(),
                             true,false);
+
+
                 });
     }
 
