@@ -73,14 +73,14 @@ public class ShipperFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View itemView = inflater.inflate(R.layout.fragment_shipper, container, false);
-        mViewModel = ViewModelProviders.of(this).get(ShipperViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(ShipperViewModel.class);
         unbinder = ButterKnife.bind(this,itemView);
         initViews();
-        mViewModel.getMessageError().observe(this,s->{
+        mViewModel.getMessageError().observe(getViewLifecycleOwner(),s->{
             Toast.makeText(getContext(), ""+s, Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
-        mViewModel.getShipperMutableList().observe(this,shippers->{
+        mViewModel.getShipperMutableList().observe(getViewLifecycleOwner(),shippers->{
             dialog.dismiss();
             shipperModelList = shippers;
             if(saveShipperBeforeSearchList == null)

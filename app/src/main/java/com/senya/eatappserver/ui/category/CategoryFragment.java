@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -75,7 +76,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         categoryViewModel =
-                ViewModelProviders.of(this).get(CategoryViewModel.class);
+                new ViewModelProvider(this).get(CategoryViewModel.class);
         View root = inflater.inflate(R.layout.fragment_category,container,false);
 
         unbinder = ButterKnife.bind(this, root);

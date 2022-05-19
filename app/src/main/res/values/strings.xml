@@ -92,4 +92,6 @@
     <string name="size_medium">Size: Medium</string>
     <string name="google_maps_key">AIzaSyAZ3DCYdVbTMSaFM735f3YSUnxr8Cm15_k</string>
     <string name="title_activity_tracking_order">TrackingOrderActivity</string>
+    <string name="menu_best_deals">Best Deals</string>
+    <string name="menu_most_popular">Most Popular</string>
 </resources>
