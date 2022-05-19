@@ -24,6 +24,7 @@ import androidx.core.app.NotificationCompat;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.FirebaseDatabase;
 import com.senya.eatappserver.R;
+import com.senya.eatappserver.model.BestDealsModel;
 import com.senya.eatappserver.model.CategoryModel;
 import com.senya.eatappserver.model.FoodModel;
 import com.senya.eatappserver.model.OrderModel;
@@ -51,6 +52,7 @@ public class Common {
     public static final int FULL_WIDTH_COLUMN = 1;
     public static FoodModel selectedFood;
     public static OrderModel currentOrderSelected;
+    public static BestDealsModel bestDealsSelected;
 
     public static void setSpanString(String welcome, String name, TextView textView) {
         SpannableStringBuilder builder = new SpannableStringBuilder();

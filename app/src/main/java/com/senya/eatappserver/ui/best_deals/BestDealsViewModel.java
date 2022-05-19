@@ -32,7 +32,7 @@ public class BestDealsViewModel extends ViewModel implements IBestDealsCallbackL
         return bestDealsListMutable;
     }
 
-    private void loadBestDeals() {
+    public void loadBestDeals() {
         List<BestDealsModel> temp = new ArrayList<>();
         DatabaseReference bestDealsRef = FirebaseDatabase.getInstance()
                 .getReference(Common.BEST_DEALS);
