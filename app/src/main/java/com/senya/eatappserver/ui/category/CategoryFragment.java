@@ -107,6 +107,15 @@ public class CategoryFragment extends Fragment {
         MySwipeHelper mySwipeHelper = new MySwipeHelper(getContext(),recycler_menu,200) {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buf) {
+
+                buf.add(new MyButton(getContext(),"Delete",30,0, Color.parseColor("#333639"),
+                        pos -> {
+
+                            Common.categorySelected = categoryModels.get(pos);
+                            showDeleteDialog();
+
+                        }));
+
                 buf.add(new MyButton(getContext(),"Update",30,0, Color.parseColor("#560027"),
                         pos -> {
 
@@ -116,6 +125,29 @@ public class CategoryFragment extends Fragment {
                 }));
             }
         };
+    }
+
+    private void showDeleteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Delete");
+        builder.setMessage("Do you really want to delete this category?");
+        builder.setNegativeButton("CANCEL", (dialogInterface, i) ->
+                dialogInterface.dismiss());
+        builder.setPositiveButton("DELETE",((dialogInterface, i) -> deleteCategory()));
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void deleteCategory() {
+        FirebaseDatabase.getInstance()
+                .getReference(Common.CATEGORY_REF)
+                .child(Common.categorySelected.getMenu_id())
+                .removeValue()
+                .addOnFailureListener(e -> Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show())
+                .addOnCompleteListener(task -> {
+                    categoryViewModel.loadCategories();
+                    EventBus.getDefault().postSticky(new ToastEvent(false, false));
+                });
     }
 
     private void showUpdateDialog() {
