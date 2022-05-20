@@ -94,4 +94,11 @@
     <string name="title_activity_tracking_order">TrackingOrderActivity</string>
     <string name="menu_best_deals">Best Deals</string>
     <string name="menu_most_popular">Most Popular</string>
+    <string name="menu_send_news">News System</string>
+    <string name="title">Title</string>
+    <string name="content">Content</string>
+    <string name="send_image">Send image</string>
+    <string name="none">None</string>
+    <string name="upload">Upload</string>
+    <string name="link">Link</string>
 </resources>

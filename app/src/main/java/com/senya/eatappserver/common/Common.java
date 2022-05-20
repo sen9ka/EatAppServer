@@ -44,6 +44,8 @@ public class Common {
     public static final String IS_OPEN_ACTIVITY_NEW_ORDER = "IsOpenActivityNewOrder";
     public static final String BEST_DEALS = "BestDeals";
     public static final String MOST_POPULAR = "MostPopular";
+    public static final String IS_SEND_IMAGE = "IS_SEND_IMAGE";
+    public static final String IMAGE_URL = "IMAGE_URL";
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static final String NOTI_TITLE = "title";
@@ -187,5 +189,9 @@ public class Common {
         else if(begin.latitude < end.latitude && begin.longitude >= end.longitude)
             return (float) ((90 - Math.toDegrees(Math.atan(lng/lat)))+270);
         return -1;
+    }
+
+    public static String getNewsTopic() {
+        return new StringBuilder("/topics/news").toString();
     }
 }
