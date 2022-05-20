@@ -34,7 +34,7 @@ public class MostPopularViewModel extends ViewModel implements IMostPopularCallb
         return mostPopularListMutable;
     }
 
-    private void loadMostPopular() {
+    public void loadMostPopular() {
         List<MostPopularModel> temp = new ArrayList<>();
         DatabaseReference mostPopularRef = FirebaseDatabase.getInstance()
                 .getReference(Common.MOST_POPULAR);

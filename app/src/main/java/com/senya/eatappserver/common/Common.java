@@ -27,6 +27,7 @@ import com.senya.eatappserver.R;
 import com.senya.eatappserver.model.BestDealsModel;
 import com.senya.eatappserver.model.CategoryModel;
 import com.senya.eatappserver.model.FoodModel;
+import com.senya.eatappserver.model.MostPopularModel;
 import com.senya.eatappserver.model.OrderModel;
 import com.senya.eatappserver.model.ServerUserModel;
 import com.senya.eatappserver.model.TokenModel;
@@ -54,6 +55,7 @@ public class Common {
     public static FoodModel selectedFood;
     public static OrderModel currentOrderSelected;
     public static BestDealsModel bestDealsSelected;
+    public static MostPopularModel mostPopularSelected;
 
     public static void setSpanString(String welcome, String name, TextView textView) {
         SpannableStringBuilder builder = new SpannableStringBuilder();
