@@ -141,7 +141,11 @@ public class Common {
     }
 
     public static String createTopicOrder() {
-        return new StringBuilder("/topics/new_order").toString();
+        return new StringBuilder("/topics/")
+                .append(Common.currentServerUser.getRestaurant())
+                .append("_")
+                .append("new_order")
+                .toString();
     }
 
     public static List<LatLng> decodePoly(String encoded) {
