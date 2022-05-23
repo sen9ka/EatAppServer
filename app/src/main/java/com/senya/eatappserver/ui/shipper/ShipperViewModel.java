@@ -45,7 +45,9 @@ public class ShipperViewModel extends ViewModel implements IShipperLoadCallbackL
 
     private void loadShipper() {
         List<ShipperModel> tempList = new ArrayList<>();
-        DatabaseReference shipperRef = FirebaseDatabase.getInstance().getReference(Common.SHIPPER);
+        DatabaseReference shipperRef = FirebaseDatabase.getInstance().getReference(Common.RESTAURANT_REF)
+                .child(Common.currentServerUser.getRestaurant())
+                .child(Common.SHIPPER);
         shipperRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -118,7 +118,9 @@ public class TrackingOrderActivity extends FragmentActivity implements OnMapRead
 
     private void checkOrderFromFirebase() {
         FirebaseDatabase.getInstance()
-                .getReference(Common.SHIPPING_ORDER_REF)
+                .getReference(Common.RESTAURANT_REF)
+                .child(Common.currentServerUser.getRestaurant())
+                .child(Common.SHIPPING_ORDER_REF)
                 .child(Common.currentOrderSelected.getOrderNumber())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -232,7 +234,9 @@ public class TrackingOrderActivity extends FragmentActivity implements OnMapRead
 
     private void subscribeShipperMove(ShippingOrderModel currentShippingOrder) {
         shipperRef = FirebaseDatabase.getInstance()
-                .getReference(Common.SHIPPING_ORDER_REF)
+                .getReference(Common.RESTAURANT_REF)
+                .child(Common.currentServerUser.getRestaurant())
+                .child(Common.SHIPPING_ORDER_REF)
                 .child(currentShippingOrder.getKey());
         shipperRef.addValueEventListener(this);
     }

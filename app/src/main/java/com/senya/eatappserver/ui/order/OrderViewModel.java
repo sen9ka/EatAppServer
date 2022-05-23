@@ -38,7 +38,9 @@ public class OrderViewModel extends ViewModel implements IOrderCallbackListener 
 
     public void loadOrderByStatus(int status) {
         List<OrderModel> tempList = new ArrayList<>();
-        Query orderRef = FirebaseDatabase.getInstance().getReference(Common.ORDER_REF)
+        Query orderRef = FirebaseDatabase.getInstance().getReference(Common.RESTAURANT_REF)
+                .child(Common.currentServerUser.getRestaurant())
+                .child(Common.ORDER_REF)
                 .orderByChild("orderStatus")
                 .equalTo(status);
         orderRef.addListenerForSingleValueEvent(new ValueEventListener() {

@@ -186,7 +186,9 @@ public class ShipperFragment extends Fragment {
         Map<String,Object> updateData = new HashMap<>();
         updateData.put("active",event.isActive());
         FirebaseDatabase.getInstance()
-                .getReference(Common.SHIPPER)
+                .getReference(Common.RESTAURANT_REF)
+                .child(Common.currentServerUser.getRestaurant())
+                .child(Common.SHIPPER)
                 .child(event.getShipperModel().getKey())
                 .updateChildren(updateData)
                 .addOnFailureListener(e -> Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show())

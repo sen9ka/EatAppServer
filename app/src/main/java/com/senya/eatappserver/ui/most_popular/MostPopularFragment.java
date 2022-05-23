@@ -209,7 +209,9 @@ public class MostPopularFragment extends Fragment {
 
     private void deleteMostPopular() {
         FirebaseDatabase.getInstance()
-                .getReference(Common.MOST_POPULAR)
+                .getReference(Common.RESTAURANT_REF)
+                .child(Common.currentServerUser.getRestaurant())
+                .child(Common.MOST_POPULAR)
                 .child(Common.mostPopularSelected.getKey())
                 .removeValue()
                 .addOnFailureListener(e -> Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show())
@@ -221,7 +223,9 @@ public class MostPopularFragment extends Fragment {
 
     private void updateMostPopular(Map<String, Object> updateData) {
         FirebaseDatabase.getInstance()
-                .getReference(Common.MOST_POPULAR)
+                .getReference(Common.RESTAURANT_REF)
+                .child(Common.currentServerUser.getRestaurant())
+                .child(Common.MOST_POPULAR)
                 .child(Common.mostPopularSelected.getKey())
                 .updateChildren(updateData)
                 .addOnFailureListener(e -> Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show())

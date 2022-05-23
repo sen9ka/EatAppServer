@@ -333,7 +333,9 @@ public class FoodListFragment extends Fragment {
         updateData.put("foods",foods);
 
         FirebaseDatabase.getInstance()
-                .getReference(Common.CATEGORY_REF)
+                .getReference(Common.RESTAURANT_REF)
+                .child(Common.currentServerUser.getRestaurant())
+                .child(Common.CATEGORY_REF)
                 .child(Common.categorySelected.getMenu_id())
                 .updateChildren(updateData)
                 .addOnFailureListener(e -> {

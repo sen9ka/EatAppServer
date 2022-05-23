@@ -46,6 +46,7 @@ public class Common {
     public static final String MOST_POPULAR = "MostPopular";
     public static final String IS_SEND_IMAGE = "IS_SEND_IMAGE";
     public static final String IMAGE_URL = "IMAGE_URL";
+    public static final String RESTAURANT_REF = "Restaurant";
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static final String NOTI_TITLE = "title";
@@ -192,6 +193,10 @@ public class Common {
     }
 
     public static String getNewsTopic() {
-        return new StringBuilder("/topics/news").toString();
+        return new StringBuilder("/topics/")
+                .append(Common.currentServerUser.getRestaurant())
+                .append("_")
+                .append("news")
+                .toString();
     }
 }
