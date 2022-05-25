@@ -3,10 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/drawable/ic_baseline_chat_bubble_24.xml" value="0.1" />
+        <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/drawable/ic_baseline_chat_bubble_white_24.xml" value="0.1" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/drawable/ic_baseline_speaker_notes_24.xml" value="0.1" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/drawable/side_nav_bar.xml" value="0.1" />
+        <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/activity_chat_list.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/activity_home.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/activity_size_addon_edit.xml" value="0.1762917933130699" />
+        <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/app_bar_home.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/best_deals_fragment.xml" value="0.1762917933130699" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/content_home.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/fragment_category.xml" value="0.17806484295845998" />
@@ -20,6 +24,7 @@
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/layout_dialog_shipped.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/layout_dialog_shipping.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/layout_food_item.xml" value="0.1" />
+        <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/layout_message_list_item.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/layout_news_system.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/layout_order_detail_item.xml" value="0.18034447821681865" />
         <entry key="..\:/Users/ars-s/Documents/EatAppServer/app/src/main/res/layout/layout_order_item.xml" value="0.33" />

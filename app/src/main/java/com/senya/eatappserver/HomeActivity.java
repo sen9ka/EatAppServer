@@ -59,6 +59,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -83,6 +85,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseStorage storage;
     private StorageReference storageReference;
 
+    @OnClick(R.id.fab_chat)
+    void onOpenChatList(){
+        startActivity(new Intent(this,ChatListActivity.class));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +96,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarHome.toolbar);
+
+        ButterKnife.bind(this);
 
         ifcmService = RetrofitFCMClient.getInstance().create(IFCMService.class);
         storage = FirebaseStorage.getInstance();

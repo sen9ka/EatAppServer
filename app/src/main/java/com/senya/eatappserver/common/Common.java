@@ -47,6 +47,7 @@ public class Common {
     public static final String IS_SEND_IMAGE = "IS_SEND_IMAGE";
     public static final String IMAGE_URL = "IMAGE_URL";
     public static final String RESTAURANT_REF = "Restaurant";
+    public static final String CHAT_REF = "Chat";
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static final String NOTI_TITLE = "title";
