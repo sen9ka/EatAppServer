@@ -199,7 +199,7 @@ public class FoodListFragment extends Fragment {
                                             Common.categorySelected.getFoods().remove(pos);
                                         else
                                             Common.categorySelected.getFoods().remove(foodModel.getPositionInList()); //убрать через сохраненный индекс
-                                        updateFood(Common.categorySelected.getFoods(), true);
+                                        updateFood(Common.categorySelected.getFoods(), Common.ACTION.DELETE);
                                     }));
                             AlertDialog deleteDialog = builder.create();
                             deleteDialog.show();
@@ -250,6 +250,77 @@ public class FoodListFragment extends Fragment {
         };
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.action_create)
+            showAddDialog();
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showAddDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Create");
+        builder.setMessage("Please fill in information");
+
+        View itemView = LayoutInflater.from(getContext()).inflate(R.layout.layout_update_food, null);
+        EditText edt_food_name = (EditText) itemView.findViewById(R.id.edt_food_name);
+        EditText edt_food_price = (EditText) itemView.findViewById(R.id.edt_food_price);
+        EditText edt_food_description = (EditText) itemView.findViewById(R.id.edt_food_description);
+        img_food = (ImageView) itemView.findViewById(R.id.img_food_image);
+
+        //Set data
+
+
+        Glide.with(getContext()).load(R.drawable.ic_baseline_image_24).into(img_food);
+
+        img_food.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
+        });
+
+        builder.setNegativeButton("CANCEL", ((dialogInterface, i) -> dialogInterface.dismiss()))
+                .setPositiveButton("CREATE",((dialogInterface, i) -> {
+
+                    FoodModel updateFood = new FoodModel();
+                    updateFood.setName(edt_food_name.getText().toString());
+                    updateFood.setDescription(edt_food_description.getText().toString());
+                    updateFood.setPrice(TextUtils.isEmpty(edt_food_price.getText()) ? 0 :
+                            Long.parseLong(edt_food_price.getText().toString()));
+                    if(imageUri != null)
+                    {
+                        String unique_name = UUID.randomUUID().toString();
+                        StorageReference imageFolder = storageReference.child("images/"+unique_name);
+
+                        imageFolder.putFile(imageUri)
+                                .addOnFailureListener(e -> Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show())
+                                .addOnCompleteListener(task -> {
+                                    imageFolder.getDownloadUrl().addOnSuccessListener(uri -> {
+                                        updateFood.setImage(uri.toString());
+                                        if(Common.categorySelected.getFoods() == null)
+                                            Common.categorySelected.setFoods(new ArrayList<>());
+                                        Common.categorySelected.getFoods().add(updateFood);
+                                        updateFood(Common.categorySelected.getFoods(), Common.ACTION.CREATE);
+                                    });
+                                }).addOnProgressListener(snapshot -> {
+                            double progress = (100.0* snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
+                        });
+                    }
+                    else
+                    {
+                        if(Common.categorySelected.getFoods() == null)
+                            Common.categorySelected.setFoods(new ArrayList<>());
+                        Common.categorySelected.getFoods().add(updateFood);
+                        updateFood(Common.categorySelected.getFoods(), Common.ACTION.CREATE);
+                    }
+                }));
+
+        builder.setView(itemView);
+        AlertDialog updateDialog = builder.create();
+        updateDialog.show();
+    }
+
     private void showUpdateDialog(int pos, FoodModel foodModel) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Update");
@@ -297,7 +368,7 @@ public class FoodListFragment extends Fragment {
                                     imageFolder.getDownloadUrl().addOnSuccessListener(uri -> {
                                         updateFood.setImage(uri.toString());
                                         Common.categorySelected.getFoods().set(pos,updateFood);
-                                        updateFood(Common.categorySelected.getFoods(),false);
+                                        updateFood(Common.categorySelected.getFoods(), Common.ACTION.UPDATE);
                                     });
                                 }).addOnProgressListener(snapshot -> {
                             double progress = (100.0* snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
@@ -306,7 +377,7 @@ public class FoodListFragment extends Fragment {
                     else
                     {
                         Common.categorySelected.getFoods().set(pos,updateFood);
-                        updateFood(Common.categorySelected.getFoods(),false);
+                        updateFood(Common.categorySelected.getFoods(), Common.ACTION.UPDATE);
                     }
                 }));
 
@@ -328,7 +399,7 @@ public class FoodListFragment extends Fragment {
         }
     }
 
-    private void updateFood(List<FoodModel> foods, boolean isDelete) {
+    private void updateFood(List<FoodModel> foods, Common.ACTION action) {
         Map<String,Object>updateData = new HashMap<>();
         updateData.put("foods",foods);
 
@@ -345,7 +416,7 @@ public class FoodListFragment extends Fragment {
                     if(task.isSuccessful())
                     {
                         foodListViewModel.getMutableLiveDataFoodList();
-                        EventBus.getDefault().postSticky(new ToastEvent(Common.ACTION.UPDATE, true));
+                        EventBus.getDefault().postSticky(new ToastEvent(action, true));
                     }
                 });
     }
