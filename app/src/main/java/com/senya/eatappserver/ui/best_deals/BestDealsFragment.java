@@ -149,7 +149,7 @@ public class BestDealsFragment extends Fragment {
                 .addOnFailureListener(e -> Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show())
                 .addOnCompleteListener(task -> {
                     mViewModel.loadBestDeals();
-                    EventBus.getDefault().postSticky(new ToastEvent(false, true));
+                    EventBus.getDefault().postSticky(new ToastEvent(Common.ACTION.DELETE, true));
                 });
     }
 
@@ -231,7 +231,7 @@ public class BestDealsFragment extends Fragment {
                 .addOnFailureListener(e -> Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show())
                 .addOnCompleteListener(task -> {
                     mViewModel.loadBestDeals();
-                    EventBus.getDefault().postSticky(new ToastEvent(true, true));
+                    EventBus.getDefault().postSticky(new ToastEvent(Common.ACTION.UPDATE, true));
                 });
     }
 
