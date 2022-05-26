@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -73,7 +74,11 @@ public class ChatListActivity extends AppCompatActivity {
 
                 holder.setListener((view, pos) -> {
 
-                    Toast.makeText(ChatListActivity.this, model.getLastMessage(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(ChatListActivity.this, model.getLastMessage(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(ChatListActivity.this,ChatDetailActivity.class);
+                    intent.putExtra(Common.KEY_ROOM_ID,adapter.getRef(position).getKey());
+                    intent.putExtra(Common.KEY_CHAT_USER,model.getCreateName());
+                    startActivity(intent);
                 });
             }
 

@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EatAppServer">
         <activity
+            android:name=".ChatDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChatListActivity"
             android:exported="false" />
 

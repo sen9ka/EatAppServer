@@ -4,13 +4,17 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.OpenableColumns;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -48,6 +52,9 @@ public class Common {
     public static final String IMAGE_URL = "IMAGE_URL";
     public static final String RESTAURANT_REF = "Restaurant";
     public static final String CHAT_REF = "Chat";
+    public static final String KEY_ROOM_ID = "CHAT_ROOM_ID";
+    public static final String KEY_CHAT_USER = "CHAT_SENDER";
+    public static final String CHAT_DETAIL_REF = "ChatDetail";
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static final String NOTI_TITLE = "title";
@@ -203,5 +210,28 @@ public class Common {
                 .append("_")
                 .append("news")
                 .toString();
+    }
+
+    public static String getFileName(ContentResolver contentResolver, Uri fileUri) {
+        String result = null;
+        if(fileUri.getScheme().equals("content"))
+        {
+            Cursor cursor = contentResolver.query(fileUri,null,null,null,null);
+            try {
+                if(cursor != null && cursor.moveToFirst())
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+            } finally {
+                cursor.close();
+            }
+        }
+        if(result == null)
+        {
+            result = fileUri.getPath();
+            int cut = result.lastIndexOf('/');
+            if(cut != -1)
+                result = result.substring(cut + 1);
+
+        }
+        return result;
     }
 }
