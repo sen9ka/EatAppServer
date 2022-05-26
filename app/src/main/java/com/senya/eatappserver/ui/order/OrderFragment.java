@@ -54,6 +54,7 @@ import com.senya.eatappserver.common.Common;
 import com.senya.eatappserver.common.MySwipeHelper;
 import com.senya.eatappserver.model.EventBus.ChangeMenuClick;
 import com.senya.eatappserver.model.EventBus.LoadOrderEvent;
+import com.senya.eatappserver.model.EventBus.PrintOrderEvent;
 import com.senya.eatappserver.model.FCMSendData;
 import com.senya.eatappserver.model.OrderModel;
 import com.senya.eatappserver.model.ShipperModel;
@@ -142,6 +143,32 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
         MySwipeHelper mySwipeHelper = new MySwipeHelper(getContext(),recycler_order,width / 6) {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buf) {
+                buf.add(new MyButton(getContext(),"Print",30,0, Color.parseColor("#8b0010"),
+                        pos -> {
+
+                            Dexter.withActivity(getActivity())
+                                    .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                    .withListener(new PermissionListener() {
+                                        @Override
+                                        public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                                            EventBus.getDefault().postSticky(new PrintOrderEvent(new StringBuilder(Common.getAppPath(getActivity()))
+                                                    .append(Common.FILE_PRINT).toString(),
+                                                    adapter.getItemAtPosition(pos)));
+                                        }
+
+                                        @Override
+                                        public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                                            Toast.makeText(getContext(), "Please accept this permission", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                                        }
+                                    }).check();
+
+                        }));
+
                 buf.add(new MyButton(getContext(),"Directions",30,0, Color.parseColor("#9b0000"),
                         pos -> {
 

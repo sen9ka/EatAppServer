@@ -88,4 +88,5 @@ dependencies {
     implementation 'com.github.MasayukiSuda:BubbleLayout:v1.2.2'
     implementation 'com.firebaseui:firebase-ui-database:6.2.1'
 
+    implementation 'com.itextpdf:itextg:5.5.10'
 }

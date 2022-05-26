@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -20,24 +21,45 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Size;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
+import androidx.fragment.app.FragmentActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.senya.eatappserver.HomeActivity;
 import com.senya.eatappserver.R;
+import com.senya.eatappserver.model.AddonModel;
 import com.senya.eatappserver.model.BestDealsModel;
+import com.senya.eatappserver.model.CartItem;
 import com.senya.eatappserver.model.CategoryModel;
 import com.senya.eatappserver.model.FoodModel;
 import com.senya.eatappserver.model.MostPopularModel;
 import com.senya.eatappserver.model.OrderModel;
 import com.senya.eatappserver.model.ServerUserModel;
+import com.senya.eatappserver.model.SizeModel;
 import com.senya.eatappserver.model.TokenModel;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 
 public class Common {
     public static final String SERVER_REF = "Server";
@@ -55,6 +77,7 @@ public class Common {
     public static final String KEY_ROOM_ID = "CHAT_ROOM_ID";
     public static final String KEY_CHAT_USER = "CHAT_SENDER";
     public static final String CHAT_DETAIL_REF = "ChatDetail";
+    public static final String FILE_PRINT = "last_order_print.pdf";
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static final String NOTI_TITLE = "title";
@@ -239,5 +262,61 @@ public class Common {
 
         }
         return result;
+    }
+
+    public static String getAppPath(Context context) {
+        File dir = new File(android.os.Environment.getExternalStorageDirectory()
+        + File.separator
+        + context.getResources().getString(R.string.app_name)
+        + File.separator
+        );
+        if(!dir.exists())
+            dir.mkdir();
+        return dir.getPath()+File.separator;
+    }
+
+    public static Observable<CartItem> getBitmapFromUrl(Context context, CartItem cartItem, Document document) {
+        return Observable.fromCallable(() -> {
+                Bitmap bitmap = Glide.with(context)
+                        .asBitmap()
+                        .load(cartItem.getFoodImage())
+                        .submit().get();
+                Image image = Image.getInstance(bitmapToByteArray(bitmap));
+                image.scaleAbsolute(80, 80);
+                document.add(image);
+
+            return cartItem;
+        });
+    }
+
+    private static byte[] bitmapToByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,stream);
+        return stream.toByteArray();
+    }
+
+    public static String formatSizeJsonToString(String foodSize) {
+        if(foodSize.equals("Default"))
+            return foodSize;
+        else
+        {
+            Gson gson = new Gson();
+            SizeModel sizeModel = gson.fromJson(foodSize, SizeModel.class);
+            return sizeModel.getName();
+        }
+    }
+
+    public static String formatAddonJsonToString(String foodAddon) {
+        if(foodAddon.equals("Default"))
+            return foodAddon;
+        else
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            Gson gson = new Gson();
+            List<AddonModel> addonModels = gson.fromJson(foodAddon,new TypeToken<List<AddonModel>>(){}.getType());
+            for(AddonModel addonModel:addonModels)
+                stringBuilder.append(addonModel.getName()).append(",");
+            return stringBuilder.substring(0,stringBuilder.length()-1);
+        }
     }
 }

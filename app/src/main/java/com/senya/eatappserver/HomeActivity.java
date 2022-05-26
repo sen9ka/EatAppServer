@@ -1,11 +1,15 @@
 package com.senya.eatappserver;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.metrics.Event;
 import android.net.Uri;
 import android.os.Bundle;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,13 +45,26 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.pdf.BaseField;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.senya.eatappserver.adapter.PdfDocumentAdapter;
 import com.senya.eatappserver.common.Common;
+import com.senya.eatappserver.common.PDFUtils;
 import com.senya.eatappserver.databinding.ActivityHomeBinding;
 import com.senya.eatappserver.model.EventBus.CategoryClick;
 import com.senya.eatappserver.model.EventBus.ChangeMenuClick;
+import com.senya.eatappserver.model.EventBus.PrintOrderEvent;
 import com.senya.eatappserver.model.EventBus.ToastEvent;
 import com.senya.eatappserver.model.FCMResponse;
 import com.senya.eatappserver.model.FCMSendData;
+import com.senya.eatappserver.model.OrderModel;
 import com.senya.eatappserver.remote.IFCMService;
 import com.senya.eatappserver.remote.RetrofitFCMClient;
 
@@ -55,12 +72,18 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -85,6 +108,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseStorage storage;
     private StorageReference storageReference;
 
+    private AlertDialog dialog;
+
     @OnClick(R.id.fab_chat)
     void onOpenChatList(){
         startActivity(new Intent(this,ChatListActivity.class));
@@ -99,12 +124,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         ButterKnife.bind(this);
 
-        ifcmService = RetrofitFCMClient.getInstance().create(IFCMService.class);
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
-
-        subscribeToTopic(Common.createTopicOrder());
-        updateToken();
+        init();
 
         drawer = binding.drawerLayout;
         navigationView = binding.navView;
@@ -127,6 +147,18 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         menuClick = R.id.nav_category; //Дефолт
 
         checkIsOpenFromActivity();
+    }
+
+    private void init(){
+        ifcmService = RetrofitFCMClient.getInstance().create(IFCMService.class);
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+        subscribeToTopic(Common.createTopicOrder());
+        updateToken();
+
+        dialog = new AlertDialog.Builder(this).setCancelable(false)
+                .setMessage("Please wait...")
+                .create();
     }
 
     private void checkIsOpenFromActivity() {
@@ -461,6 +493,145 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 imgUri = data.getData();
                 img_upload.setImageURI(imgUri);
             }
+        }
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void onPrintEventListener(PrintOrderEvent event)
+    {
+        createPDFFile(event.getPath(),event.getOrderModel());
+    }
+
+    private void createPDFFile(String path, OrderModel orderModel) {
+        dialog.show();
+
+        if(new File(path).exists())
+            new File(path).delete();
+        try {
+            Document document = new Document();
+            //Save
+            PdfWriter.getInstance(document,new FileOutputStream(path));
+            //Open
+            document.open();
+
+            //Settings
+            document.setPageSize(PageSize.A4);
+            document.addCreationDate();
+            document.addAuthor("My restaurant");
+            document.addCreator(Common.currentServerUser.getName());
+
+            //Font settings
+            BaseColor colorAccent = new BaseColor(0,153,204,255);
+            float fontSize = 20.0f;
+
+            //Custom font
+            BaseFont fontName = BaseFont.createFont("assets/fonts/brandon_medium.otf","UTF-8",BaseFont.EMBEDDED);
+
+            //Title of document
+            Font titleFont = new Font(fontName,36.0f,Font.NORMAL,BaseColor.BLACK);
+            PDFUtils.addNewItem(document,"Order Details", Element.ALIGN_CENTER,titleFont);
+
+            Font orderNumberfont = new Font(fontName,fontSize,Font.NORMAL,colorAccent);
+            PDFUtils.addNewItem(document,"Order No:",Element.ALIGN_LEFT,orderNumberfont);
+            Font orderNumberValueFont = new Font(fontName,20,Font.NORMAL,BaseColor.BLACK);
+            PDFUtils.addNewItem(document,orderModel.getKey(),Element.ALIGN_LEFT,orderNumberValueFont);
+
+            PDFUtils.addLineSeparator(document);
+
+            PDFUtils.addNewItem(document,"Order Date",Element.ALIGN_LEFT,orderNumberfont);
+            PDFUtils.addNewItem(document,new SimpleDateFormat("dd/MM/yyyy").format(orderModel.getCreateDate()),Element.ALIGN_LEFT,orderNumberValueFont);
+
+            PDFUtils.addLineSeparator(document);
+
+            //Account name
+            PDFUtils.addNewItem(document,"Account Name:",Element.ALIGN_LEFT,orderNumberfont);
+            PDFUtils.addNewItem(document,orderModel.getUserName(),Element.ALIGN_LEFT,orderNumberValueFont);
+
+            PDFUtils.addLineSeparator(document);
+
+            //Add product and details
+            PDFUtils.addLineSpace(document);
+            PDFUtils.addNewItem(document,"Product Details",Element.ALIGN_CENTER,titleFont);
+            PDFUtils.addLineSeparator(document);
+
+            Observable.fromIterable(orderModel.getCartItemList())
+                    .flatMap(cartItem -> Common.getBitmapFromUrl(HomeActivity.this,cartItem,document))
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe( cartItem -> {
+
+                        PDFUtils.addNewItemWithLeftAndRight(document,cartItem.getFoodName(),
+                                ("(0.0%"),
+                                titleFont,
+                                orderNumberValueFont);
+
+                        PDFUtils.addNewItemWithLeftAndRight(document,
+                                "Size",
+                                Common.formatSizeJsonToString(cartItem.getFoodSize()),
+                                titleFont,
+                                orderNumberValueFont);
+                        PDFUtils.addNewItemWithLeftAndRight(document,
+                                "Addons",
+                                Common.formatAddonJsonToString(cartItem.getFoodAddon()),
+                                titleFont,
+                                orderNumberValueFont);
+
+                        //Food Price
+                        PDFUtils.addNewItemWithLeftAndRight(document,
+                                new StringBuilder()
+                                        .append(cartItem.getFoodQuantity())
+                                .append("*")
+                                .append(cartItem.getFoodPrice() + cartItem.getFoodExtraPrice())
+                                .toString(),
+                                new StringBuilder()
+                                .append(cartItem.getFoodQuantity()*(cartItem.getFoodExtraPrice()+cartItem.getFoodPrice()))
+                                .toString(),
+                                titleFont,
+                                orderNumberValueFont);
+
+                        PDFUtils.addLineSeparator(document);
+
+                    }, throwable -> {
+                        dialog.dismiss();
+                        Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    },()->{
+
+                        PDFUtils.addLineSpace(document);
+                        PDFUtils.addLineSpace(document);
+
+                        PDFUtils.addNewItemWithLeftAndRight(document,"Total",
+                                new StringBuilder()
+                        .append(orderModel.getTotalPayment()).toString(),
+                                titleFont,
+                                titleFont);
+
+                        document.close();
+                        dialog.dismiss();
+                        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+
+                        printPdf();
+
+                    });
+
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void printPdf() {
+        PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+        try {
+            PrintDocumentAdapter printDocumentAdapter = new PdfDocumentAdapter(this,new StringBuilder(Common.getAppPath(this))
+            .append(Common.FILE_PRINT).toString());
+            printManager.print("Document",printDocumentAdapter,new PrintAttributes.Builder().build());
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
         }
     }
 }
