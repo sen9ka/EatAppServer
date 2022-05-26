@@ -35,6 +35,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -228,25 +229,27 @@ public class SizeAddonEditActivity extends AppCompatActivity {
     {
         if(!event.isAddon()) //если эвент это размер
         {
-            if(Common.selectedFood.getSize() != null) //если размер не пустой
-            {
+            if(Common.selectedFood.getSize() == null)
+                Common.selectedFood.setSize(new ArrayList<>());
+
                 adapter = new MySizeAdapter(this,Common.selectedFood.getSize());
                 foodEditPosition = event.getPos(); //Сохранить ред еды для апдейта
                 recycler_addon_size.setAdapter(adapter);
 
                 isAddon = event.isAddon();
-            }
+
         }
         else // is addon
         {
-            if(Common.selectedFood.getAddon() != null) //если аддон не пустой
-            {
+            if(Common.selectedFood.getAddon() == null)
+                Common.selectedFood.setAddon(new ArrayList<>());
+
                 addonAdapter = new MyAddonAdapter(this,Common.selectedFood.getAddon());
                 foodEditPosition = event.getPos(); //Сохранить ред еды для апдейта
                 recycler_addon_size.setAdapter(addonAdapter);
 
                 isAddon = event.isAddon();
-            }
+
         }
     }
 
