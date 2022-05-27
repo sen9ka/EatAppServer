@@ -285,6 +285,7 @@ public class FoodListFragment extends Fragment {
 
                     FoodModel updateFood = new FoodModel();
                     updateFood.setName(edt_food_name.getText().toString());
+                    updateFood.setId(UUID.randomUUID().toString());
                     updateFood.setDescription(edt_food_description.getText().toString());
                     updateFood.setPrice(TextUtils.isEmpty(edt_food_price.getText()) ? 0 :
                             Long.parseLong(edt_food_price.getText().toString()));

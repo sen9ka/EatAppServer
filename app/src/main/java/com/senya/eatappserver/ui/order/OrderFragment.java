@@ -393,6 +393,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
 
     private void createShippingOrder(int pos, ShipperModel shipperModel, OrderModel orderModel, AlertDialog dialog) {
         ShippingOrderModel shippingOrderModel = new ShippingOrderModel();
+        shippingOrderModel.setRestaurantKey(Common.currentServerUser.getRestaurant());
         shippingOrderModel.setShipperPhone(shipperModel.getPhone());
         shippingOrderModel.setShipperName(shipperModel.getName());
         shippingOrderModel.setOrderModel(orderModel);

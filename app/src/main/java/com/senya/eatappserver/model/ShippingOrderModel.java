@@ -9,7 +9,17 @@ public class ShippingOrderModel {
     private OrderModel orderModel;
     private boolean isStartTrip;
 
+    private String restaurantKey;
+
     public ShippingOrderModel() {
+    }
+
+    public String getRestaurantKey() {
+        return restaurantKey;
+    }
+
+    public void setRestaurantKey(String restaurantKey) {
+        this.restaurantKey = restaurantKey;
     }
 
     public String getKey() {
