@@ -1,9 +1,13 @@
 package com.senya.eatappserver;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.media.metrics.Event;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,9 +24,15 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -30,6 +40,7 @@ import com.google.android.material.navigation.NavigationView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -38,6 +49,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -54,6 +66,12 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.BaseField;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.senya.eatappserver.adapter.PdfDocumentAdapter;
 import com.senya.eatappserver.common.Common;
 import com.senya.eatappserver.common.PDFUtils;
@@ -65,6 +83,7 @@ import com.senya.eatappserver.model.EventBus.ToastEvent;
 import com.senya.eatappserver.model.FCMResponse;
 import com.senya.eatappserver.model.FCMSendData;
 import com.senya.eatappserver.model.OrderModel;
+import com.senya.eatappserver.model.RestaurantLocationModel;
 import com.senya.eatappserver.remote.IFCMService;
 import com.senya.eatappserver.remote.RetrofitFCMClient;
 
@@ -311,6 +330,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     navController.navigate(R.id.nav_most_popular);
                 }
                 break;
+            case R.id.nav_location:
+                showUpdateLocationDialog();
+                break;
             case R.id.nav_send_news:
                 showNewsDialog();
                 break;
@@ -324,6 +346,69 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         menuClick = menuItem.getItemId();
         return true;
+    }
+
+    private void showUpdateLocationDialog() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setTitle("Update location");
+        builder.setMessage("Do you want to update this restaurant location?");
+
+        builder.setNegativeButton("NO",(dialogInterface, i) -> {
+           dialogInterface.dismiss();
+        });
+        builder.setPositiveButton("YES", (dialogInterface, i) -> {
+
+            Dexter.withContext(HomeActivity.this)
+                    .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                    .withListener(new PermissionListener() {
+                        @SuppressLint("MissingPermission")
+                        @Override
+                        public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+
+                            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(HomeActivity.this);
+
+
+                            fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, new CancellationToken() {
+                                @NonNull
+                                @Override
+                                public boolean isCancellationRequested() {
+                                    return true;
+                                }
+                                @Override
+                                public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
+                                    return null;
+                                }
+                            }).addOnSuccessListener(location -> {
+
+                                FirebaseDatabase.getInstance()
+                                        .getReference(Common.RESTAURANT_REF)
+                                        .child(Common.currentServerUser.getRestaurant())
+                                        .child(Common.LOCATION_REF)
+                                        .setValue(new RestaurantLocationModel(location.getLatitude(),location.getLongitude()))
+                                        .addOnSuccessListener(unused -> {
+                                            Toast.makeText(HomeActivity.this, "Location updated successfully", Toast.LENGTH_SHORT).show();
+                                        }).addOnFailureListener(e -> {
+                                    Toast.makeText(HomeActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+
+                            }).addOnFailureListener(e -> Toast.makeText(HomeActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show());
+
+                        }
+
+                        @Override
+                        public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                            Toast.makeText(HomeActivity.this, "Accept this permission", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                        }
+                    }).check();
+
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void showNewsDialog() {

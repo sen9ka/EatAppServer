@@ -78,6 +78,7 @@ public class Common {
     public static final String KEY_CHAT_USER = "CHAT_SENDER";
     public static final String CHAT_DETAIL_REF = "ChatDetail";
     public static final String FILE_PRINT = "last_order_print.pdf";
+    public static final String LOCATION_REF = "Location";
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static final String NOTI_TITLE = "title";
