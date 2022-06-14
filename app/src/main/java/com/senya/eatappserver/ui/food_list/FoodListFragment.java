@@ -184,16 +184,16 @@ public class FoodListFragment extends Fragment {
         MySwipeHelper mySwipeHelper = new MySwipeHelper(getContext(),recycler_food_list,width / 6) {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buf) {
-                buf.add(new MyButton(getContext(),"Delete",30,0, Color.parseColor("#9b0000"),
+                buf.add(new MyButton(getContext(),"Удалить",30,0, Color.parseColor("#9b0000"),
                         pos -> {
 
                         if(foodModelList != null)
                             Common.selectedFood = foodModelList.get(pos);
                             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                            builder.setTitle("DELETE")
-                                    .setMessage("Are you sure you want to delete this item?")
-                                    .setNegativeButton("CANCEL", ((dialogInterface, i) -> dialogInterface.dismiss()))
-                                    .setPositiveButton("DELETE", ((dialogInterface, i) -> {
+                            builder.setTitle("УДАЛИТЬ")
+                                    .setMessage("Удалить это блюдо?")
+                                    .setNegativeButton("ОТМЕНА", ((dialogInterface, i) -> dialogInterface.dismiss()))
+                                    .setPositiveButton("УДАЛИТЬ", ((dialogInterface, i) -> {
                                         FoodModel foodModel = adapter.getItemAtPosition(pos); // Добавить айтем в адаптер
                                         if(foodModel.getPositionInList() == -1) // Если == -1 дефолт, ничего не делать
                                             Common.categorySelected.getFoods().remove(pos);
@@ -206,7 +206,7 @@ public class FoodListFragment extends Fragment {
 
                         }));
 
-                buf.add(new MyButton(getContext(),"Update",30,0, Color.parseColor("#560027"),
+                buf.add(new MyButton(getContext(),"Обновить",30,0, Color.parseColor("#560027"),
                         pos -> {
 
                         FoodModel foodModel = adapter.getItemAtPosition(pos);
@@ -217,7 +217,7 @@ public class FoodListFragment extends Fragment {
 
                         }));
 
-                buf.add(new MyButton(getContext(),"Size",30,0, Color.parseColor("#12005e"),
+                buf.add(new MyButton(getContext(),"Размер",30,0, Color.parseColor("#12005e"),
                         pos -> {
                             FoodModel foodModel = adapter.getItemAtPosition(pos);
                             if(foodModel.getPositionInList() == -1)
@@ -232,7 +232,7 @@ public class FoodListFragment extends Fragment {
                                 EventBus.getDefault().postSticky(new AddonSizeEditEvent(false,foodModel.getPositionInList()));
                         }));
 
-                buf.add(new MyButton(getContext(),"Addon",30,0, Color.parseColor("#336699"),
+                buf.add(new MyButton(getContext(),"Добавки",30,0, Color.parseColor("#336699"),
                         pos -> {
 
                             FoodModel foodModel = adapter.getItemAtPosition(pos);
@@ -259,8 +259,8 @@ public class FoodListFragment extends Fragment {
 
     private void showAddDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Create");
-        builder.setMessage("Please fill in information");
+        builder.setTitle("Создать");
+        builder.setMessage("Пожалуйста введите информацию");
 
         View itemView = LayoutInflater.from(getContext()).inflate(R.layout.layout_update_food, null);
         EditText edt_food_name = (EditText) itemView.findViewById(R.id.edt_food_name);
@@ -277,11 +277,11 @@ public class FoodListFragment extends Fragment {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
+            startActivityForResult(Intent.createChooser(intent,"Выберите изображение"),PICK_IMAGE_REQUEST);
         });
 
-        builder.setNegativeButton("CANCEL", ((dialogInterface, i) -> dialogInterface.dismiss()))
-                .setPositiveButton("CREATE",((dialogInterface, i) -> {
+        builder.setNegativeButton("ОТМЕНА", ((dialogInterface, i) -> dialogInterface.dismiss()))
+                .setPositiveButton("СОЗДАТЬ",((dialogInterface, i) -> {
 
                     FoodModel updateFood = new FoodModel();
                     updateFood.setName(edt_food_name.getText().toString());
@@ -324,8 +324,8 @@ public class FoodListFragment extends Fragment {
 
     private void showUpdateDialog(int pos, FoodModel foodModel) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Update");
-        builder.setMessage("Please fill in information");
+        builder.setTitle("Обновить");
+        builder.setMessage("Пожалуйста введите информацию");
 
         View itemView = LayoutInflater.from(getContext()).inflate(R.layout.layout_update_food, null);
         EditText edt_food_name = (EditText) itemView.findViewById(R.id.edt_food_name);
@@ -347,11 +347,11 @@ public class FoodListFragment extends Fragment {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
+            startActivityForResult(Intent.createChooser(intent,"ВЫберите изображение"),PICK_IMAGE_REQUEST);
         });
 
-        builder.setNegativeButton("CANCEL", ((dialogInterface, i) -> dialogInterface.dismiss()))
-                .setPositiveButton("UPDATE",((dialogInterface, i) -> {
+        builder.setNegativeButton("ОТМЕНА", ((dialogInterface, i) -> dialogInterface.dismiss()))
+                .setPositiveButton("ОБНОВИТЬ",((dialogInterface, i) -> {
 
                     FoodModel updateFood = foodModel;
                     updateFood.setName(edt_food_name.getText().toString());

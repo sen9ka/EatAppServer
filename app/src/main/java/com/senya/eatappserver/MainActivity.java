@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                             else
                             {
                                 dialog.dismiss();
-                                Toast.makeText(MainActivity.this, "Wait for the approval", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Ждите одобрения", Toast.LENGTH_SHORT).show();
                             }
                         }
                         else
@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void showRegisterDialog(FirebaseUser user) {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle("Register");
-        builder.setMessage("Fill In your Information \n It will be accepted later");
+        builder.setTitle("Зарегистрироваться");
+        builder.setMessage("Введите информацию \n Заявка будет одобрена позднее");
 
         View itemView = LayoutInflater.from(this).inflate(R.layout.layout_register,null);
         TextInputLayout phone_input_layout = (TextInputLayout)itemView.findViewById(R.id.phone_input_layout);
@@ -136,11 +136,11 @@ public class MainActivity extends AppCompatActivity {
         else
             edt_phone.setText(user.getPhoneNumber());
 
-        builder.setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
-                .setPositiveButton("Register", (dialogInterface, i) -> {
+        builder.setNegativeButton("Отмена", (dialogInterface, i) -> dialogInterface.dismiss())
+                .setPositiveButton("Регистрация", (dialogInterface, i) -> {
                     if(TextUtils.isEmpty(edt_name.getText().toString()))
                     {
-                        Toast.makeText(MainActivity.this, "Enter your name", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Введите имя", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             dialog.dismiss();
-                            Toast.makeText(MainActivity.this, "Successfully registered. Wait for the approval", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Успешная регистрация. Ждите одобрения.", Toast.LENGTH_SHORT).show();
                             //goToHomeActivity(serverUserModel);
                         }
                     });

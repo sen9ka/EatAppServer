@@ -322,7 +322,7 @@ public class ChatDetailActivity extends AppCompatActivity implements ILoadTimeFr
         {
             AlertDialog dialog = new AlertDialog.Builder(ChatDetailActivity.this)
                     .setCancelable(false)
-                    .setMessage("Please wait...")
+                    .setMessage("Подождите...")
                     .create();
             dialog.show();
 
@@ -528,7 +528,7 @@ public class ChatDetailActivity extends AppCompatActivity implements ILoadTimeFr
             }
             else
             {
-                Toast.makeText(this, "Please choose image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Выберите изображение", Toast.LENGTH_SHORT).show();
             }
         }
     }

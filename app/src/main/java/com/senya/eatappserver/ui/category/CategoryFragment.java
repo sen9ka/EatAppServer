@@ -112,7 +112,7 @@ public class CategoryFragment extends Fragment {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buf) {
 
-                buf.add(new MyButton(getContext(),"Delete",30,0, Color.parseColor("#333639"),
+                buf.add(new MyButton(getContext(),"Удалить",30,0, Color.parseColor("#333639"),
                         pos -> {
 
                             Common.categorySelected = categoryModels.get(pos);
@@ -120,7 +120,7 @@ public class CategoryFragment extends Fragment {
 
                         }));
 
-                buf.add(new MyButton(getContext(),"Update",30,0, Color.parseColor("#560027"),
+                buf.add(new MyButton(getContext(),"Обновить",30,0, Color.parseColor("#560027"),
                         pos -> {
 
                         Common.categorySelected = categoryModels.get(pos);
@@ -150,11 +150,11 @@ public class CategoryFragment extends Fragment {
 
     private void showDeleteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Delete");
-        builder.setMessage("Do you really want to delete this category?");
-        builder.setNegativeButton("CANCEL", (dialogInterface, i) ->
+        builder.setTitle("Удалить");
+        builder.setMessage("Удалить эту категорию?");
+        builder.setNegativeButton("ОТМЕНА", (dialogInterface, i) ->
                 dialogInterface.dismiss());
-        builder.setPositiveButton("DELETE",((dialogInterface, i) -> deleteCategory()));
+        builder.setPositiveButton("УДАЛИТЬ",((dialogInterface, i) -> deleteCategory()));
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -175,8 +175,8 @@ public class CategoryFragment extends Fragment {
 
     private void showUpdateDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Update");
-        builder.setMessage("Please fill in information");
+        builder.setTitle("Обновить");
+        builder.setMessage("Пожалуйста введите информацию");
 
         View itemView = LayoutInflater.from(getContext()).inflate(R.layout.layout_update_category, null);
         EditText edt_category_name = (EditText) itemView.findViewById(R.id.edt_category_name);
@@ -190,20 +190,17 @@ public class CategoryFragment extends Fragment {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
+            startActivityForResult(Intent.createChooser(intent,"Выберите изображение"),PICK_IMAGE_REQUEST);
         });
 
-        builder.setNegativeButton("CANCEL", (dialogInterface, i) -> dialogInterface.dismiss());
-        builder.setPositiveButton("UPDATE", (dialogInterface, i) -> {
+        builder.setNegativeButton("ОТМЕНА", (dialogInterface, i) -> dialogInterface.dismiss());
+        builder.setPositiveButton("ОБНОВИТЬ", (dialogInterface, i) -> {
 
             Map<String,Object> updateData = new HashMap<>();
             updateData.put("name",edt_category_name.getText().toString());
 
             if(imageUri != null)
             {
-                //Исп хранилище БД для загрузки фото
-                //dialog.setMessage("Uploading...");
-                //dialog.show();
                 String unique_name = UUID.randomUUID().toString();
                 StorageReference imageFolder = storageReference.child("images/"+unique_name);
 
@@ -245,8 +242,8 @@ public class CategoryFragment extends Fragment {
 
     private void showAddDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Create");
-        builder.setMessage("Please fill in information");
+        builder.setTitle("Создать");
+        builder.setMessage("Пожалуйста введите информацию");
 
         View itemView = LayoutInflater.from(getContext()).inflate(R.layout.layout_update_category, null);
         EditText edt_category_name = (EditText) itemView.findViewById(R.id.edt_category_name);
@@ -259,11 +256,11 @@ public class CategoryFragment extends Fragment {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
+            startActivityForResult(Intent.createChooser(intent,"Выберите изображение"),PICK_IMAGE_REQUEST);
         });
 
-        builder.setNegativeButton("CANCEL", (dialogInterface, i) -> dialogInterface.dismiss());
-        builder.setPositiveButton("CREATE", (dialogInterface, i) -> {
+        builder.setNegativeButton("ОТМЕНА", (dialogInterface, i) -> dialogInterface.dismiss());
+        builder.setPositiveButton("СОЗДАТЬ", (dialogInterface, i) -> {
 
 
 

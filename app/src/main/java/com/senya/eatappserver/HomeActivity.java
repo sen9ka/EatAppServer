@@ -386,7 +386,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                         .child(Common.LOCATION_REF)
                                         .setValue(new RestaurantLocationModel(location.getLatitude(),location.getLongitude()))
                                         .addOnSuccessListener(unused -> {
-                                            Toast.makeText(HomeActivity.this, "Location updated successfully", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(HomeActivity.this, "Местоположение обновлено", Toast.LENGTH_SHORT).show();
                                         }).addOnFailureListener(e -> {
                                     Toast.makeText(HomeActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                                         });
@@ -397,7 +397,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
                         @Override
                         public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                            Toast.makeText(HomeActivity.this, "Accept this permission", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(HomeActivity.this, "Примите разрешение", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -413,8 +413,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void showNewsDialog() {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle("News System");
-        builder.setMessage("Send notification to all clients");
+        builder.setTitle("Новостная система");
+        builder.setMessage("Отправить уведомления всем подписанным");
         View itemView = LayoutInflater.from(this).inflate(R.layout.layout_news_system,null);
 
         //View
@@ -443,14 +443,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
+            startActivityForResult(Intent.createChooser(intent,"Выберите картинку"),PICK_IMAGE_REQUEST);
         });
 
         builder.setView(itemView);
-        builder.setNegativeButton("CANCEL", (dialogInterface, i) -> {
+        builder.setNegativeButton("ОТМЕНА", (dialogInterface, i) -> {
             dialogInterface.dismiss();
         });
-        builder.setPositiveButton("SEND", (dialogInterface, i) -> {
+        builder.setPositiveButton("ОТПРАВИТЬ", (dialogInterface, i) -> {
             if(rdi_none.isChecked())
             {
                 sendNews(edt_title.getText().toString(),edt_content.getText().toString());
@@ -463,7 +463,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             {
                 if(imgUri != null)
                 {
-                    AlertDialog dialog = new AlertDialog.Builder(this).setMessage("Uploading...").create();
+                    AlertDialog dialog = new AlertDialog.Builder(this).setMessage("Загрузка...").create();
                     dialog.show();
 
                     String file_name = UUID.randomUUID().toString();
@@ -477,7 +477,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                 newsImages.getDownloadUrl().addOnSuccessListener(uri -> sendNews(edt_title.getText().toString(),edt_content.getText().toString(),uri.toString()));
                             }).addOnProgressListener(taskSnapshot -> {
                                 double progress = Math.round((100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()));
-                                dialog.setMessage(new StringBuilder("Uploading: ").append(progress).append("%"));
+                                dialog.setMessage(new StringBuilder("Загрузка: ").append(progress).append("%"));
                             });
                 }
             }
@@ -498,7 +498,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         FCMSendData fcmSendData = new FCMSendData(Common.getNewsTopic(),notificationData);
 
-        AlertDialog dialog = new AlertDialog.Builder(this).setMessage("Waiting...").create();
+        AlertDialog dialog = new AlertDialog.Builder(this).setMessage("Подождите...").create();
         dialog.show();
 
         compositeDisposable.add(ifcmService.sendNotification(fcmSendData)
@@ -507,9 +507,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 .subscribe(fcmResponse -> {
                     dialog.dismiss();
                     if(fcmResponse.getMessage_id() != 0)
-                        Toast.makeText(this, "Notifications has been sent", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Уведомления отправлены", Toast.LENGTH_SHORT).show();
                     else
-                        Toast.makeText(this, "Failed to send notifications", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Ошибка отправки уведомлений", Toast.LENGTH_SHORT).show();
                 },throwable -> {
                     dialog.dismiss();
                     Toast.makeText(this, ""+throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -524,7 +524,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         FCMSendData fcmSendData = new FCMSendData(Common.getNewsTopic(),notificationData);
 
-        AlertDialog dialog = new AlertDialog.Builder(this).setMessage("Waiting...").create();
+        AlertDialog dialog = new AlertDialog.Builder(this).setMessage("Подождите...").create();
         dialog.show();
 
         compositeDisposable.add(ifcmService.sendNotification(fcmSendData)
@@ -533,7 +533,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         .subscribe(fcmResponse -> {
             dialog.dismiss();
             if(fcmResponse.getMessage_id() != 0)
-                Toast.makeText(this, "Notifications has been sent", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Уведомления отправлены", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(this, "Failed to send notifications", Toast.LENGTH_SHORT).show();
         },throwable -> {
@@ -544,14 +544,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void signOut() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Sign Out")
-                .setMessage("Do you really want to sign out?")
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setTitle("Выход")
+                .setMessage("Вы действительно хотите выйти?")
+                .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                }).setPositiveButton("Ок", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Common.selectedFood = null;
@@ -615,29 +615,29 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             //Title of document
             Font titleFont = new Font(fontName,36.0f,Font.NORMAL,BaseColor.BLACK);
-            PDFUtils.addNewItem(document,"Order Details", Element.ALIGN_CENTER,titleFont);
+            PDFUtils.addNewItem(document,"Детали заказа", Element.ALIGN_CENTER,titleFont);
 
             Font orderNumberfont = new Font(fontName,fontSize,Font.NORMAL,colorAccent);
-            PDFUtils.addNewItem(document,"Order No:",Element.ALIGN_LEFT,orderNumberfont);
+            PDFUtils.addNewItem(document,"Номер заказа:",Element.ALIGN_LEFT,orderNumberfont);
             Font orderNumberValueFont = new Font(fontName,20,Font.NORMAL,BaseColor.BLACK);
             PDFUtils.addNewItem(document,orderModel.getKey(),Element.ALIGN_LEFT,orderNumberValueFont);
 
             PDFUtils.addLineSeparator(document);
 
-            PDFUtils.addNewItem(document,"Order Date",Element.ALIGN_LEFT,orderNumberfont);
+            PDFUtils.addNewItem(document,"Дата заказа",Element.ALIGN_LEFT,orderNumberfont);
             PDFUtils.addNewItem(document,new SimpleDateFormat("dd/MM/yyyy").format(orderModel.getCreateDate()),Element.ALIGN_LEFT,orderNumberValueFont);
 
             PDFUtils.addLineSeparator(document);
 
             //Account name
-            PDFUtils.addNewItem(document,"Account Name:",Element.ALIGN_LEFT,orderNumberfont);
+            PDFUtils.addNewItem(document,"Имя аккаунта:",Element.ALIGN_LEFT,orderNumberfont);
             PDFUtils.addNewItem(document,orderModel.getUserName(),Element.ALIGN_LEFT,orderNumberValueFont);
 
             PDFUtils.addLineSeparator(document);
 
             //Add product and details
             PDFUtils.addLineSpace(document);
-            PDFUtils.addNewItem(document,"Product Details",Element.ALIGN_CENTER,titleFont);
+            PDFUtils.addNewItem(document,"Детали продукта",Element.ALIGN_CENTER,titleFont);
             PDFUtils.addLineSeparator(document);
 
             Observable.fromIterable(orderModel.getCartItemList())
@@ -652,12 +652,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                 orderNumberValueFont);
 
                         PDFUtils.addNewItemWithLeftAndRight(document,
-                                "Size",
+                                "РАзмер",
                                 Common.formatSizeJsonToString(cartItem.getFoodSize()),
                                 titleFont,
                                 orderNumberValueFont);
                         PDFUtils.addNewItemWithLeftAndRight(document,
-                                "Addons",
+                                "Добавки",
                                 Common.formatAddonJsonToString(cartItem.getFoodAddon()),
                                 titleFont,
                                 orderNumberValueFont);
@@ -686,7 +686,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         PDFUtils.addLineSpace(document);
                         PDFUtils.addLineSpace(document);
 
-                        PDFUtils.addNewItemWithLeftAndRight(document,"Total",
+                        PDFUtils.addNewItemWithLeftAndRight(document,"Всего",
                                 new StringBuilder()
                         .append(orderModel.getTotalPayment()).toString(),
                                 titleFont,
@@ -694,7 +694,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
                         document.close();
                         dialog.dismiss();
-                        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Успешно", Toast.LENGTH_SHORT).show();
 
                         printPdf();
 

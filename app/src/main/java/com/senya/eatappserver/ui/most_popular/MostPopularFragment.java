@@ -109,7 +109,7 @@ public class MostPopularFragment extends Fragment {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buf) {
 
-                buf.add(new MyButton(getContext(),"Delete",30,0, Color.parseColor("#333639"),
+                buf.add(new MyButton(getContext(),"Удалить",30,0, Color.parseColor("#333639"),
                         pos -> {
 
                             Common.mostPopularSelected = mostPopularModels.get(pos);
@@ -117,7 +117,7 @@ public class MostPopularFragment extends Fragment {
 
                         }));
 
-                buf.add(new MyButton(getContext(),"Update",30,0, Color.parseColor("#560027"),
+                buf.add(new MyButton(getContext(),"Обновить",30,0, Color.parseColor("#560027"),
                         pos -> {
 
                             Common.mostPopularSelected = mostPopularModels.get(pos);
@@ -133,8 +133,8 @@ public class MostPopularFragment extends Fragment {
 
     private void showUpdateDialog() {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getContext());
-        builder.setTitle("Update");
-        builder.setMessage("Please fill in information");
+        builder.setTitle("Обновить");
+        builder.setMessage("Пожалуйста введите информацию");
 
         View itemView = LayoutInflater.from(getContext()).inflate(R.layout.layout_update_category, null);
         EditText edt_category_name = (EditText) itemView.findViewById(R.id.edt_category_name);
@@ -148,11 +148,11 @@ public class MostPopularFragment extends Fragment {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
+            startActivityForResult(Intent.createChooser(intent,"Выберите изображение"),PICK_IMAGE_REQUEST);
         });
 
-        builder.setNegativeButton("CANCEL", (dialogInterface, i) -> dialogInterface.dismiss());
-        builder.setPositiveButton("UPDATE", (dialogInterface, i) -> {
+        builder.setNegativeButton("ОТМЕНА", (dialogInterface, i) -> dialogInterface.dismiss());
+        builder.setPositiveButton("УДАЛИТЬ", (dialogInterface, i) -> {
 
             Map<String,Object> updateData = new HashMap<>();
             updateData.put("name",edt_category_name.getText().toString());
@@ -189,14 +189,14 @@ public class MostPopularFragment extends Fragment {
 
     private void showDeleteDialog() {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getContext());
-        builder.setTitle("Delete");
-        builder.setMessage("Do you really want to delete this?");
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+        builder.setTitle("Удалить");
+        builder.setMessage("Вы действительно ъотите удалить это??");
+        builder.setNegativeButton("ОТМЕНА", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
             }
-        }).setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+        }).setPositiveButton("УДАЛИТЬ", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 deleteMostPopular();

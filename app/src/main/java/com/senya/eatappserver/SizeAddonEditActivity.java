@@ -135,10 +135,10 @@ public class SizeAddonEditActivity extends AppCompatActivity {
                 if(needSave)
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Cancel?")
-                            .setMessage("Are you really want to close without saving?")
-                            .setNegativeButton("CANCEL", (dialogInterface, i) -> dialogInterface.dismiss())
-                            .setPositiveButton("OK", (dialog, which) -> {
+                    builder.setTitle("Отменить?")
+                            .setMessage("Вы действительно хотите выйти без сохранения?")
+                            .setNegativeButton("ОТМЕНИТЬ", (dialogInterface, i) -> dialogInterface.dismiss())
+                            .setPositiveButton("ОК", (dialog, which) -> {
                                 needSave = false;
                                 closeActivity();
                             });
@@ -172,7 +172,7 @@ public class SizeAddonEditActivity extends AppCompatActivity {
                     .addOnCompleteListener(task -> {
                         if(task.isSuccessful())
                         {
-                            Toast.makeText(this, "Successfully Reloaded!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Перезагружено успешно!", Toast.LENGTH_SHORT).show();
                             needSave = false;
                             edt_price.setText("0");
                             edt_name.setText("");

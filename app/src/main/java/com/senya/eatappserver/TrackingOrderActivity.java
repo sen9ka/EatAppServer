@@ -134,7 +134,7 @@ public class TrackingOrderActivity extends FragmentActivity implements OnMapRead
                         }
                         else
                         {
-                            Toast.makeText(TrackingOrderActivity.this, "Order not found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TrackingOrderActivity.this, "Заказ не найден", Toast.LENGTH_SHORT).show();
                         }
                     }
 

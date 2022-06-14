@@ -123,15 +123,15 @@ public class Common {
         switch (orderStatus)
         {
             case 0:
-                return "Placed";
+                return "Размещен";
             case 1:
-                return "Shipping";
+                return "Доставляется";
             case 2:
-                return "Shipped";
+                return "Доставлен";
             case -1:
-                return "Cancelled";
+                return "Отменен";
             default:
-                return "Error";
+                return "Ошибка";
         }
     }
 

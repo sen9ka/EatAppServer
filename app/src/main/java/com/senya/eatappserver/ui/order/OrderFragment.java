@@ -143,7 +143,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
         MySwipeHelper mySwipeHelper = new MySwipeHelper(getContext(),recycler_order,width / 6) {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buf) {
-                buf.add(new MyButton(getContext(),"Print",30,0, Color.parseColor("#8b0010"),
+                buf.add(new MyButton(getContext(),"Печать",30,0, Color.parseColor("#8b0010"),
                         pos -> {
 
                             Dexter.withActivity(getActivity())
@@ -169,7 +169,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
 
                         }));
 
-                buf.add(new MyButton(getContext(),"Directions",30,0, Color.parseColor("#9b0000"),
+                buf.add(new MyButton(getContext(),"Направления",30,0, Color.parseColor("#9b0000"),
                         pos -> {
 
                             OrderModel orderModel = ((MyOrderAdapter)recycler_order.getAdapter())
@@ -182,14 +182,14 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                             }
                             else 
                             {
-                                Toast.makeText(getContext(), new StringBuilder("Your order is")
+                                Toast.makeText(getContext(), new StringBuilder("Ваш заказ")
                                         .append(Common.convertStatusToString(orderModel.getOrderStatus()))
-                                        .append(". So you can not track it"), Toast.LENGTH_SHORT).show();
+                                        .append(". Отслеживание невозможно"), Toast.LENGTH_SHORT).show();
                             }
 
                         }));
 
-                buf.add(new MyButton(getContext(),"Call",30,0, Color.parseColor("#560027"),
+                buf.add(new MyButton(getContext(),"Позвонить",30,0, Color.parseColor("#560027"),
                         pos -> {
 
                             Dexter.withActivity(getActivity())
@@ -218,13 +218,13 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
 
                         }));
 
-                buf.add(new MyButton(getContext(),"Remove",30,0, Color.parseColor("#12005e"),
+                buf.add(new MyButton(getContext(),"Удалить",30,0, Color.parseColor("#12005e"),
                         pos -> {
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
-                            .setTitle("Delete")
-                            .setMessage("Do you really want to delete this order?")
-                                    .setNegativeButton("CANCEL", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("DELETE", (dialogInterface, i) -> {
+                            .setTitle("Удалить")
+                            .setMessage("Удалить этот заказ?")
+                                    .setNegativeButton("ОТМЕНА", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("УДАЛИТЬ", (dialogInterface, i) -> {
                                         OrderModel orderModel = adapter.getItemAtPosition(pos);
                                         FirebaseDatabase.getInstance()
                                                 .getReference(Common.RESTAURANT_REF)
@@ -238,7 +238,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                                                     adapter.notifyItemRemoved(pos);
                                                     updateTextCounter();
                                                     dialogInterface.dismiss();
-                                                    Toast.makeText(getContext(), "Order has been deleted", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getContext(), "Заказ удален", Toast.LENGTH_SHORT).show();
                                                 });
                                     });
 
@@ -252,7 +252,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
 
                         }));
 
-                buf.add(new MyButton(getContext(),"Edit",30,0, Color.parseColor("#336699"),
+                buf.add(new MyButton(getContext(),"Редактировать",30,0, Color.parseColor("#336699"),
                         pos -> {
 
                             showEditDialog(adapter.getItemAtPosition(pos),pos);
@@ -301,10 +301,9 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
 
         TextView txt_status = (TextView) layout_dialog.findViewById(R.id.txt_status);
 
-        txt_status.setText(new StringBuilder("Order Status(")
+        txt_status.setText(new StringBuilder("Статус заказа(")
         .append(Common.convertStatusToString(orderModel.getOrderStatus())));
 
-        //Диалог
         AlertDialog dialog = builder.create();
 
         if(orderModel.getOrderStatus() == 0) //Shipping
@@ -313,8 +312,6 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
         else
             showDialog(pos,orderModel,dialog,btn_ok,btn_cancel,
                     rdi_shipping,rdi_shipped,rdi_cancelled,rdi_delete,rdi_restore_placed);
-
-        
     }
 
     private void loadShipperList(int pos, OrderModel orderModel, AlertDialog dialog, Button btn_ok, Button btn_cancel, RadioButton rdi_shipping, RadioButton rdi_shipped, RadioButton rdi_cancelled, RadioButton rdi_delete, RadioButton rdi_restore_placed) {
@@ -370,7 +367,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                         createShippingOrder(pos, shipperModel,orderModel,dialog);
                     }
                     else
-                        Toast.makeText(getContext(), "Please select shipper", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Выберите курьера", Toast.LENGTH_SHORT).show();
                 }
             }
             else if(rdi_shipped != null && rdi_shipped.isChecked())
@@ -427,8 +424,8 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                                         {
                                             TokenModel tokenModel = snapshot.getValue(TokenModel.class);
                                             Map<String,String> notiData = new HashMap<>();
-                                            notiData.put(Common.NOTI_TITLE,"You have new order to be delivered");
-                                            notiData.put(Common.NOTI_CONTENT, new StringBuilder("You have new order to be delivered to ")
+                                            notiData.put(Common.NOTI_TITLE,"У вас новый заказ для доставки");
+                                            notiData.put(Common.NOTI_CONTENT, new StringBuilder("У вас новый аказ для доставки на ")
                                                     .append(orderModel.getUserPhone()).toString());
 
                                             FCMSendData sendData = new FCMSendData(tokenModel.getToken(),notiData);
@@ -444,7 +441,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                                                         }
                                                         else
                                                         {
-                                                            Toast.makeText(getContext(), "Failed to notify shipper. Order has not been updated", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(getContext(), "Ошибка отправки уведомления курьеру", Toast.LENGTH_SHORT).show();
                                                         }
 
                                                     }, throwable -> {
@@ -485,7 +482,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                         adapter.removeItem(pos);
                         adapter.notifyItemRemoved(pos);
                         updateTextCounter();
-                        Toast.makeText(getContext(), "Order successfully deleted!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Заказ удален!", Toast.LENGTH_SHORT).show();
                     });
         }
         else
@@ -526,10 +523,10 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                                         {
                                             TokenModel tokenModel = snapshot.getValue(TokenModel.class);
                                             Map<String,String> notiData = new HashMap<>();
-                                            notiData.put(Common.NOTI_TITLE,"Your order has been updated");
-                                            notiData.put(Common.NOTI_CONTENT, new StringBuilder("Your order ")
+                                            notiData.put(Common.NOTI_TITLE,"Статус заказа обновлен");
+                                            notiData.put(Common.NOTI_CONTENT, new StringBuilder("Ваш заказ ")
                                             .append(orderModel.getKey())
-                                            .append(" has been updated to ")
+                                            .append(" был изменен на ")
                                             .append(Common.convertStatusToString(status)).toString());
 
                                             FCMSendData sendData = new FCMSendData(tokenModel.getToken(),notiData);
@@ -541,7 +538,7 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                                                 dialog.dismiss();
                                                 if(fcmResponse.getSuccess() == 1)
                                                 {
-                                                    Toast.makeText(getContext(), "Order has been successfully updated!", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getContext(), "Заказ был обновлен!", Toast.LENGTH_SHORT).show();
                                                 }
                                                 else
                                                 {
